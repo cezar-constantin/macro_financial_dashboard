@@ -223,6 +223,16 @@ export function buildReport(P) {
           );
       }
     }
+    if (!ys.length) {
+      const q0 = lastObs(inP(obsOf("gdp_yoy_q"), from, to), to);
+      if (q0)
+        summary.push(
+          L(
+            `Creștere: PIB-ul trimestrial ${sgn(q0[1], 1)} % an/an (${fmtPeriod(q0[0])}); datele anuale pentru ${to} nu sunt încă publicate.`,
+            `Growth: quarterly GDP ${sgn(q0[1], 1)}% y/y (${fmtPeriod(q0[0])}); annual data for ${to} are not yet published.`
+          )
+        );
+    }
     // drivers
     const parts = [
       ["contrib_cons_a", L("consumul gospodăriilor", "household consumption")],
@@ -342,8 +352,8 @@ export function buildReport(P) {
       const bp = (a) => nf(Math.abs(a.reduce((s, [, d]) => s + d, 0)) * 100, 0);
       out.push(
         L(
-          `Politica monetară: dobânda BNR a pornit de la ${pc(pr.first[1], 2)} și a încheiat perioada la ${pc(pr.last[1], 2)}, cu un maxim de ${pc(pr.max[1], 2)}. ${hikes.length ? `Au existat ${hikes.length} luni cu majorări (în total ${bp(hikes)} puncte de bază, prima în ${fmtPeriod(hikes[0][0])})` : "Nu au existat majorări"}${cuts.length ? ` și ${cuts.length} cu reduceri (${bp(cuts)} puncte de bază)` : ""}.`,
-          `Monetary policy: the NBR rate started at ${pc(pr.first[1], 2)} and ended at ${pc(pr.last[1], 2)}, with a maximum of ${pc(pr.max[1], 2)}. ${hikes.length ? `There were ${hikes.length} months with hikes (${bp(hikes)} basis points in total, the first in ${fmtPeriod(hikes[0][0])})` : "There were no hikes"}${cuts.length ? ` and ${cuts.length} with cuts (${bp(cuts)} basis points)` : ""}.`
+          `Politica monetară: dobânda BNR a pornit de la ${pc(pr.first[1], 2)} și a încheiat perioada la ${pc(pr.last[1], 2)}, cu un maxim de ${pc(pr.max[1], 2)}. ${!moves.length ? "Dobânda nu a fost modificată în perioadă" : `${hikes.length ? `Au existat ${hikes.length} luni cu majorări (în total ${bp(hikes)} puncte de bază, prima în ${fmtPeriod(hikes[0][0])})` : "Nu au existat majorări"}${cuts.length ? ` și ${cuts.length} cu reduceri (${bp(cuts)} puncte de bază)` : ""}`}.`,
+          `Monetary policy: the NBR rate started at ${pc(pr.first[1], 2)} and ended at ${pc(pr.last[1], 2)}, with a maximum of ${pc(pr.max[1], 2)}. ${!moves.length ? "The rate was not changed during the period" : `${hikes.length ? `There were ${hikes.length} months with hikes (${bp(hikes)} basis points in total, the first in ${fmtPeriod(hikes[0][0])})` : "There were no hikes"}${cuts.length ? ` and ${cuts.length} with cuts (${bp(cuts)} basis points)` : ""}`}.`
         )
       );
       if (h) {
@@ -638,7 +648,9 @@ export function buildReport(P) {
     if (isNum(d) && d < -3 && isNum(ca) && ca < -3) tags.push(L("deficite gemene", "twin deficits"));
     else if (isNum(d) && d < -3) tags.push(L("deficit bugetar excesiv", "excessive budget deficit"));
     summary.unshift(
-      L(`Perioada ${from}–${to} se caracterizează prin: ${tags.join(", ")}.`, `The period ${from}–${to} is characterised by: ${tags.join(", ")}.`)
+      from === to
+        ? L(`Anul ${from} se caracterizează prin: ${tags.join(", ")}.`, `The year ${from} is characterised by: ${tags.join(", ")}.`)
+        : L(`Perioada ${from}–${to} se caracterizează prin: ${tags.join(", ")}.`, `The period ${from}–${to} is characterised by: ${tags.join(", ")}.`)
     );
   }
 

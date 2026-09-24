@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-24T21:23:27Z",
+ "generated": "2026-09-24T21:29:46Z",
  "results": [
   {
    "id": "gdp_real_a",
@@ -14,7 +14,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "gdp_nominal_a",
@@ -25,7 +25,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "gdp_nominal_ron_a",
@@ -36,7 +36,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "gdp_yoy_q",
@@ -51,7 +51,7 @@
      "2026-Q2"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "gdp_qoq_q",
@@ -66,7 +66,7 @@
      "2026-Q2"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "contrib_cons_a",
@@ -77,7 +77,7 @@
      "2025"
     ]
    },
-   "sec": 2.5
+   "sec": 0.3
   },
   {
    "id": "contrib_gov_a",
@@ -88,7 +88,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "contrib_gfcf_a",
@@ -99,7 +99,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "contrib_inv_a",
@@ -110,7 +110,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "contrib_nx_a",
@@ -126,7 +126,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "indprod_m",
@@ -141,7 +141,7 @@
      "2026-07"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "retail_m",
@@ -156,7 +156,7 @@
      "2026-07"
     ]
    },
-   "sec": 0.8
+   "sec": 0.4
   },
   {
    "id": "constr_m",
@@ -167,7 +167,7 @@
      "2026-07"
     ]
    },
-   "sec": 0.6
+   "sec": 0.3
   },
   {
    "id": "esi_m",
@@ -182,7 +182,7 @@
      "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "cons_conf_m",
@@ -197,59 +197,59 @@
      "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "hicp_m",
    "ok": true,
    "series": {
     "hicp_m": [
-     132,
-     "2025-12"
+     140,
+     "2026-08"
     ],
     "hicp_m_eu": [
-     132,
-     "2025-12"
+     140,
+     "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 1.0
   },
   {
    "id": "hicp_core_m",
    "ok": true,
    "series": {
     "hicp_core_m": [
-     132,
-     "2025-12"
+     140,
+     "2026-08"
     ],
     "hicp_core_m_eu": [
-     132,
-     "2025-12"
+     140,
+     "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 1.1
   },
   {
    "id": "hicp_food_m",
    "ok": true,
    "series": {
     "hicp_food_m": [
-     132,
-     "2025-12"
+     140,
+     "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 1.1
   },
   {
    "id": "hicp_energy_m",
    "ok": true,
    "series": {
     "hicp_energy_m": [
-     132,
-     "2025-12"
+     140,
+     "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 1.1
   },
   {
    "id": "hpi_q",
@@ -264,7 +264,7 @@
      "2026-Q1"
     ]
    },
-   "sec": 1.5
+   "sec": 0.4
   },
   {
    "id": "unemp_m",
@@ -279,7 +279,7 @@
      "2026-07"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "unemp_youth_m",
@@ -294,7 +294,7 @@
      "2026-07"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "emp_rate_a",
@@ -309,7 +309,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "lci_q",
@@ -320,7 +320,7 @@
      "2026-Q2"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "ulc_a",
@@ -335,7 +335,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "min_wage_s",
@@ -346,7 +346,7 @@
      "2026-S2"
     ]
    },
-   "sec": 0.5
+   "sec": 0.9
   },
   {
    "id": "deficit_a",
@@ -361,7 +361,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "debt_a",
@@ -376,7 +376,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "debt_q",
@@ -391,7 +391,7 @@
      "2026-Q1"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "gov_rev_a",
@@ -406,7 +406,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "gov_exp_a",
@@ -421,7 +421,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "gov_int_a",
@@ -436,37 +436,73 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "ca_gdp_q",
-   "ok": false,
-   "error": "bop_gdp6_q: filter leaves several categories in ['freq']"
+   "ok": true,
+   "series": {
+    "ca_gdp_q": [
+     45,
+     "2026-Q1"
+    ]
+   },
+   "sec": 0.7
   },
   {
    "id": "ca_q",
-   "ok": false,
-   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=CA&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+   "ok": true,
+   "series": {
+    "ca_q": [
+     45,
+     "2026-Q1"
+    ]
+   },
+   "sec": 0.7
   },
   {
    "id": "goods_q",
-   "ok": false,
-   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=G&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+   "ok": true,
+   "series": {
+    "goods_q": [
+     45,
+     "2026-Q1"
+    ]
+   },
+   "sec": 0.7
   },
   {
    "id": "services_q",
-   "ok": false,
-   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=S&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+   "ok": true,
+   "series": {
+    "services_q": [
+     45,
+     "2026-Q1"
+    ]
+   },
+   "sec": 0.7
   },
   {
    "id": "primary_q",
-   "ok": false,
-   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=IN1&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+   "ok": true,
+   "series": {
+    "primary_q": [
+     45,
+     "2026-Q1"
+    ]
+   },
+   "sec": 0.6
   },
   {
    "id": "secondary_q",
-   "ok": false,
-   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=IN2&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+   "ok": true,
+   "series": {
+    "secondary_q": [
+     45,
+     "2026-Q1"
+    ]
+   },
+   "sec": 0.7
   },
   {
    "id": "niip_a",
@@ -477,7 +513,73 @@
      "2025"
     ]
    },
+   "sec": 0.4
+  },
+  {
+   "id": "mip_ca3_a",
+   "ok": true,
+   "series": {
+    "mip_ca3_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "mip_reer3_a",
+   "ok": true,
+   "series": {
+    "mip_reer3_a": [
+     11,
+     "2025"
+    ]
+   },
    "sec": 0.5
+  },
+  {
+   "id": "mip_ulc3_a",
+   "ok": true,
+   "series": {
+    "mip_ulc3_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "mip_hpi_a",
+   "ok": true,
+   "series": {
+    "mip_hpi_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "credit_gdp_a",
+   "ok": true,
+   "series": {
+    "credit_gdp_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "credit_flow_a",
+   "ok": true,
+   "series": {
+    "credit_flow_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.6
   },
   {
    "id": "irate3m_m",
@@ -488,7 +590,7 @@
      "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "bond10y_m",
@@ -499,7 +601,7 @@
      "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "eurron_m_es",
@@ -510,7 +612,7 @@
      "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "population_a",
@@ -521,7 +623,7 @@
      "2025"
     ]
    },
-   "sec": 0.5
+   "sec": 0.3
   },
   {
    "id": "policy_rate_m",
@@ -535,16 +637,6 @@
    "sec": 0.5
   },
   {
-   "id": "credit_gdp_q",
-   "ok": false,
-   "error": "https://stats.bis.org/api/v1/data/WS_TC/Q.RO.P.A.M.770.A/all?startPeriod=2015-01-01&detail=dataonly&format=csv: HTTP Error 404: "
-  },
-  {
-   "id": "credit_gap_q",
-   "ok": false,
-   "error": "https://stats.bis.org/api/v1/data/WS_CREDIT_GAP/Q.RO.P.A.C/all?startPeriod=2015-01-01&detail=dataonly&format=csv: HTTP Error 404: "
-  },
-  {
    "id": "reer_m",
    "ok": true,
    "series": {
@@ -553,12 +645,22 @@
      "2026-08"
     ]
    },
-   "sec": 0.5
+   "sec": 0.4
   },
   {
    "id": "bnr_fx",
-   "ok": false,
-   "error": "syntax error: line 1, column 0"
+   "ok": true,
+   "series": {
+    "eurron_m": [
+     132,
+     "2025-12"
+    ],
+    "usdron_m": [
+     132,
+     "2025-12"
+    ]
+   },
+   "sec": 16.1
   },
   {
    "id": "imf_gdp",
@@ -569,7 +671,7 @@
      "2031"
     ]
    },
-   "sec": 10.4
+   "sec": 10.5
   },
   {
    "id": "imf_cpi",
@@ -580,7 +682,7 @@
      "2031"
     ]
    },
-   "sec": 8.6
+   "sec": 10.3
   },
   {
    "id": "imf_unemp",
@@ -591,7 +693,7 @@
      "2031"
     ]
    },
-   "sec": 11.6
+   "sec": 8.5
   },
   {
    "id": "imf_ca",
@@ -602,7 +704,7 @@
      "2031"
     ]
    },
-   "sec": 10.8
+   "sec": 9.3
   },
   {
    "id": "imf_balance",
@@ -613,7 +715,7 @@
      "2031"
     ]
    },
-   "sec": 9.4
+   "sec": 8.2
   },
   {
    "id": "imf_debt",
@@ -624,7 +726,7 @@
      "2031"
     ]
    },
-   "sec": 10.3
+   "sec": 10.7
   },
   {
    "id": "wb_gdp_pc_usd",
@@ -635,7 +737,7 @@
      "2025"
     ]
    },
-   "sec": 0.2
+   "sec": 0.1
   },
   {
    "id": "wb_fdi_gdp",
@@ -646,7 +748,7 @@
      "2025"
     ]
    },
-   "sec": 0.3
+   "sec": 0.1
   },
   {
    "id": "wb_trade_gdp",
@@ -657,7 +759,7 @@
      "2025"
     ]
    },
-   "sec": 0.4
+   "sec": 0.1
   },
   {
    "id": "wb_remit_gdp",
@@ -668,12 +770,18 @@
      "2025"
     ]
    },
-   "sec": 0.2
+   "sec": 0.1
   },
   {
    "id": "ins_wage_m",
-   "ok": false,
-   "error": "INS FOM106E: no rows parsed; head=CAEN Rev.2  (activitati ale economiei nationale), Sexe, Macroregiuni  regiuni de dezvoltare si judete, Ani, UM: Lei  lei RON (incepand cu 2005), Valoare\nTOTAL, Total, TOTAL, Anul 2008, Lei, 1309\n"
+   "ok": true,
+   "series": {
+    "ins_wage_m": [
+     132,
+     "2025-12"
+    ]
+   },
+   "sec": 2.2
   }
  ]
 }

@@ -113,14 +113,14 @@ export function scoreboard(P) {
   const niip = lastObs(obsOf("niip_a"), to);
   if (niip) add("niip", L(`Poziția investițională internațională netă (${niip[0]})`, `Net international investment position (${niip[0]})`), niip[1], pGDP, "> −35 %", niip[1] < -35, offNote);
   const r3 = official("mip_reer3_a");
-  if (r3) add("reer", L(`Cursul real efectiv, variație pe 3 ani (${+r3[0] - 3}–${r3[0]})`, `Real effective exchange rate, 3-year change (${+r3[0] - 3}–${r3[0]})`), r3[1], (x) => sgn(x, 1) + " %", "±11 %", Math.abs(r3[1]) > 11, offNote);
+  if (r3) add("reer", L(`Cursul real efectiv, variație pe 3 ani (${+r3[0] - 3}–${r3[0]})`, `Real effective exchange rate, 3-year change (${+r3[0] - 3}–${r3[0]})`), r3[1], (x) => sgn(x, 1) + " %", "±10 %", Math.abs(r3[1]) > 10, offNote);
   else {
     const reer = annualAvg(obsOf("reer_m"), { full: true });
     const ry = Object.keys(reer).map(Number).filter((y) => y <= to);
     if (ry.length >= 4) {
       const y = Math.max(...ry);
       const v = (reer[y] / reer[y - 3] - 1) * 100;
-      add("reer", L(`Cursul real efectiv, variație pe 3 ani (${y - 3}–${y})`, `Real effective exchange rate, 3-year change (${y - 3}–${y})`), v, (x) => sgn(x, 1) + " %", "±11 %", Math.abs(v) > 11, L("indicele BIS, deflatat cu IPC", "BIS index, CPI-deflated"));
+      add("reer", L(`Cursul real efectiv, variație pe 3 ani (${y - 3}–${y})`, `Real effective exchange rate, 3-year change (${y - 3}–${y})`), v, (x) => sgn(x, 1) + " %", "±10 %", Math.abs(v) > 10, L("indicele BIS, deflatat cu IPC", "BIS index, CPI-deflated"));
     }
   }
   const u3 = official("mip_ulc3_a");
@@ -135,24 +135,18 @@ export function scoreboard(P) {
     }
   }
   const hr = official("mip_hpi_a");
-  if (hr) add("hpi", L(`Prețurile locuințelor, variație reală (${hr[0]})`, `House prices, real change (${hr[0]})`), hr[1], (x) => sgn(x, 1) + " %", "< +6 %", hr[1] > 6, offNote);
+  if (hr) add("hpi", L(`Prețurile locuințelor, variație nominală anuală (${hr[0]})`, `House prices, nominal annual change (${hr[0]})`), hr[1], (x) => sgn(x, 1) + " %", "< +9 %", hr[1] > 9, offNote);
   else {
     const hpi = annualAvg(obsOf("hpi_q"), { full: true });
-    const hicpA = annualAvg(obsOf("hicp_m"), { full: true });
-    const hy = Object.keys(hpi).map(Number).filter((y) => y <= to && isNum(hicpA[y]));
+    const hy = Object.keys(hpi).map(Number).filter((y) => y <= to);
     if (hy.length) {
       const y = Math.max(...hy);
-      const v = ((1 + hpi[y] / 100) / (1 + hicpA[y] / 100) - 1) * 100;
-      add("hpi", L(`Prețurile locuințelor, variație reală (${y})`, `House prices, real change (${y})`), v, (x) => sgn(x, 1) + " %", "< +6 %", v > 6, L("deflatat cu IAPC", "HICP-deflated"));
+      add("hpi", L(`Prețurile locuințelor, variație nominală anuală (${y})`, `House prices, nominal annual change (${y})`), hpi[y], (x) => sgn(x, 1) + " %", "< +9 %", hpi[y] > 9, calcNote);
     }
   }
-  for (const [id, thr, lab] of [
-    ["credit_gdp_a", 133, L("Datoria sectorului privat", "Private sector debt")],
-    ["credit_flow_a", 14, L("Fluxul de credit către sectorul privat", "Private sector credit flow")],
-  ]) {
-    const o = lastObs(obsOf(id), to);
-    if (o) add(id, `${lab} (${o[0]})`, o[1], pGDP, `< ${thr} %`, o[1] > thr, offNote);
-  }
+  // private debt and credit flow are not scored here: the current MIP headline indicators are split into
+  // households and non-financial corporations (thresholds 55/85 % of GDP and 14/13 % of the debt stock),
+  // while the series on the dashboard are the combined private sector (see defs.js)
   const debt = lastObs(obsOf("debt_a"), to);
   if (debt) add("debt", L(`Datoria publică (${debt[0]})`, `Government debt (${debt[0]})`), debt[1], pGDP, "< 60 %", debt[1] > 60, offNote);
   const un = annualAvg(obsOf("unemp_m"), { full: true });

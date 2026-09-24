@@ -1,5 +1,6 @@
 // Dashboard: KPI snapshot at the end of the chosen period and themed trend charts.
-import { t, isNum, applyStaticTranslations } from "./common.js";
+import { t, isNum, applyStaticTranslations, getLang } from "./common.js";
+import { DEFS } from "./defs.js";
 import {
   $, L, E, nf, sgn, IND, indName, fmtI, fmtU, fmtPeriod, loadData, obsOf, has, S, inP, lastObs, firstObs,
   annualAvg, toObs, caRolling, caAnnual, getPeriod, periodPanel, renderMacroShell, errorPanel, tsChart,
@@ -7,6 +8,7 @@ import {
 } from "./macro.js";
 
 const state = { P: null, eu: true };
+const ro_ = () => getLang() === "ro";
 
 // ------------------------------------------------------------------ derived series
 const fxEurId = () => (has("eurron_m") ? "eurron_m" : "eurron_m_es");
@@ -79,14 +81,72 @@ function kpiPanel() {
   </section>`;
 }
 
+// ------------------------------------------------------------------ definitions (defs.js) per chart
+// Keyed by the series a card plots; every chart gets the official definition of what it shows.
+const CARD_DEFS = {
+  gdp_real_a: ["gdp_real"],
+  gdp_yoy_q: ["gdp_q"],
+  contrib_cons_a: ["contrib", "hfce", "govcons", "gfcf", "inventories", "netexp"],
+  indprod_m: ["indprod", "retail", "constr", "ma3"],
+  esi_m: ["esi"],
+  gdp_pc_pps_a: ["pps"],
+  wb_gdp_pc_usd: ["gdp_pc_usd"],
+  hicp_m: ["hicp", "core"],
+  hicp_food_m: ["food_energy", "core"],
+  "policy_rate_m,irate3m_m,bond10y_m": ["policy", "robor", "bond10y"],
+  "policy_rate_m,hicp_m": ["realrate", "policy", "hicp"],
+  hpi_q: ["hpi"],
+  unemp_m: ["unemp"],
+  unemp_youth_m: ["youth"],
+  emp_rate_a: ["emprate"],
+  "lci_q,hicp_m": ["lci", "hicp"],
+  ulc_a: ["ulc"],
+  ins_wage_m: ["wage"],
+  min_wage_s: ["minwage"],
+  deficit_a: ["deficit"],
+  debt_q: ["debt"],
+  debt_a: ["debt"],
+  "gov_rev_a,gov_exp_a": ["revenue", "expenditure"],
+  gov_int_a: ["interest"],
+  "ca_q,gdp_nominal_a": ["ca"],
+  ca_q: ["ca_parts"],
+  niip_a: ["niip"],
+  reer_m: ["reer"],
+  wb_fdi_gdp: ["fdi", "remit"],
+  "bond10y_m,policy_rate_m": ["slope", "bond10y", "policy"],
+  credit_gdp_a: ["privdebt"],
+  credit_flow_a: ["credflow"],
+  cons_conf_m: ["consconf"],
+};
+function defsFor(srcIds) {
+  const k = srcIds.join(",");
+  if (CARD_DEFS[k]) return CARD_DEFS[k];
+  if (/^eurron/.test(k)) return ["fx"];
+  return CARD_DEFS[srcIds[0]] || [];
+}
+function defBox(keys) {
+  const items = keys.map((k) => DEFS[k]).filter(Boolean);
+  if (!items.length) return "";
+  return `<div class="def-box">
+    <p class="def-kicker">${E(items.length > 1 ? L("Definiții", "Definitions") : L("Definiție", "Definition"))}</p>
+    <dl>${items
+      .map(
+        (d) => `<dt>${E(ro_() ? d.name.ro : d.name.en)}${d.calc ? ` <span class="def-calc">${E(L("calcul propriu", "own calculation"))}</span>` : ""}</dt>
+      <dd>${E(ro_() ? d.ro : d.en)}${d.src.length ? ` <span class="def-src">${d.src.map((s) => `<a href="${E(s.url)}" target="_blank" rel="noreferrer">${E(ro_() ? s.ro : s.en)}</a>`).join(" · ")}</span>` : ""}</dd>`
+      )
+      .join("")}</dl>
+  </div>`;
+}
+
 // ------------------------------------------------------------------ chart cards
-function card(title, caption, chart, items, srcIds, extraClass = "") {
+function card(title, caption, chart, items, srcIds, extraClass = "", defKeys = null) {
   const srcs = [...new Set(srcIds.map((id) => S(id)?.source).filter(Boolean))];
   return `<article class="card panel-card chart-card${extraClass}">
     <div><h3>${E(title)}</h3>${caption ? `<p class="chart-caption">${E(caption)}</p>` : ""}</div>
     ${chart}
     ${items && items.length ? legend(items) : ""}
     ${srcs.length ? `<p class="source-note">${E(t("d.source"))}: ${E(srcs.join(" · "))}</p>` : ""}
+    ${defBox(defKeys || defsFor(srcIds))}
   </article>`;
 }
 const ro = (id, extra = {}) => ({ obs: obsOf(id), label: L("România", "Romania"), color: C.ro, fmt: (v) => fmtI(id, v), ...extra });
@@ -214,7 +274,7 @@ function prices() {
         null,
         ["policy_rate_m", "hicp_m"]
       ) +
-      roEu("hpi_q", L("Prețurile locuințelor", "House prices"), L("Variație anuală, nominală. Pragul MIP (6 %) se aplică variației reale.", "Annual change, nominal. The MIP threshold (6%) applies to the real change."))
+      roEu("hpi_q", L("Prețurile locuințelor", "House prices"), L("Variație anuală, nominală. Pragul orientativ MIP este +9 % pe an (variație nominală).", "Annual change, nominal. The indicative MIP threshold is +9% a year (nominal change)."))
   );
 }
 
@@ -352,10 +412,10 @@ function financial() {
     return obsOf("bond10y_m").filter(([p]) => isNum(pr[p])).map(([p, v]) => [p, +(v - pr[p]).toFixed(2)]);
   })();
   const credit = has("credit_gdp_a")
-    ? card(indName("credit_gdp_a"), L("Stocul de datorie al firmelor și gospodăriilor, % din PIB (consolidat). Prag MIP: 133 %.", "Debt stock of firms and households, % of GDP (consolidated). MIP threshold: 133%."), tsChart([ro("credit_gdp_a")], from, to, { yfmt: pctAxis }), null, ["credit_gdp_a"])
+    ? card(indName("credit_gdp_a"), L("Stocul de datorie al firmelor și gospodăriilor, % din PIB (consolidat).", "Debt stock of firms and households, % of GDP (consolidated)."), tsChart([ro("credit_gdp_a")], from, to, { yfmt: pctAxis }), null, ["credit_gdp_a"])
     : "";
   const flow = has("credit_flow_a")
-    ? card(indName("credit_flow_a"), L("Fluxul anual de credit către sectorul privat, % din PIB. Prag MIP: 14 %.", "Annual credit flow to the private sector, % of GDP. MIP threshold: 14%."), tsChart([ro("credit_flow_a", { bars: true })], from, to, { yfmt: pctAxis }), null, ["credit_flow_a"])
+    ? card(indName("credit_flow_a"), L("Fluxul anual de credit către sectorul privat, % din PIB.", "Annual credit flow to the private sector, % of GDP."), tsChart([ro("credit_flow_a", { bars: true })], from, to, { yfmt: pctAxis }), null, ["credit_flow_a"])
     : "";
   return section(
     "financial",
@@ -399,6 +459,7 @@ function outlook() {
       ${tsChart(g, Math.max(state.P.min, y0 - 5), y0 + 5, { yfmt: pctAxis, width: 1300, height: 280 })}
       ${legend(g)}
       <p class="source-note">${E(t("d.source"))}: ${E(S("imf_gdp")?.source || "")}</p>
+      ${defBox(["imf_gdp", "imf_other"])}
     </article>`
   );
 }

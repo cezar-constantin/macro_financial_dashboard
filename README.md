@@ -15,6 +15,16 @@ Live: https://cezar-constantin.github.io/macro_financial_dashboard/
 | `analiza.html` — analiza generată | Motorul de analiză (`engine.js`) citește seriile perioadei și scrie raportul: rezumat executiv, creștere, inflație și politică monetară, piața muncii, finanțe publice, echilibre externe, perspective, riscuri și întrebări de seminar. Alături: tabloul dezechilibrelor după pragurile MIP, tabelul anual cu datele folosite și un prompt gata făcut pentru un asistent AI extern, ca studenții să compare cele două abordări. Export .md, copiere, tipărire. |
 | `surse.html` — date și surse | Catalogul celor 84 de serii: instituția, codul exact al setului de date, frecvența, prima și ultima observație, descărcare CSV (una sau toate). |
 
+## Definițiile indicatorilor
+
+Sub fiecare grafic apare definiția oficială a indicatorilor afișați, cu legătura către sursă. Textele sunt
+redări condensate, în română și engleză, ale definițiilor publicate de instituțiile care produc datele:
+glosarul Eurostat (Statistics Explained), metadatele ESMS ale seturilor Eurostat, notele indicatorilor
+Băncii Mondiale, descrierile FMI (WEO), metadatele matricei INS și descrierile BIS. Originalele sunt
+descărcate de `scripts/fetch_definitions.py` (workflow-ul `fetch-definitions.yml`) în
+`data/definitions_source.json`; textele afișate sunt în `defs.js`. Indicatorii calculați în tablou
+(dobânda reală, panta curbei, exportul net rezidual, media mobilă) sunt marcați „calcul propriu”.
+
 ## De ce „AI” fără API
 
 Cerința a fost ca utilizatorii să nu facă apeluri API. Analiza este deci produsă de un **motor de reguli
@@ -57,12 +67,13 @@ trebuie servite printr-un server web: deschise direct din fișier, browserul blo
 ```
 index.html  tablou.html  analiza.html  surse.html
 macro.js       – i18n, shell, acces la date, selectorul de perioadă, graficele SVG
+defs.js        – definițiile oficiale ale indicatorilor, afișate sub grafice
 engine.js      – motorul de analiză, tabloul MIP, exportul și promptul
 tablou.js  analiza.js  surse.js  home.js
 common.js  styles.css  – preluate din aplicațiile de analiză financiară, ca aspectul să fie identic
 macro.css      – completări de stil pentru tabloul macro
-data/          – macro.json și jurnalul ultimei descărcări
-scripts/       – fetch_data.py
+data/          – macro.json, jurnalul ultimei descărcări, definitions_source.json (textele originale ale definițiilor)
+scripts/       – fetch_data.py, fetch_definitions.py
 ```
 
 ## Publicare

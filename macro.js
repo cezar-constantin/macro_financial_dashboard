@@ -343,7 +343,7 @@ export const IND = {
   mip_ca3_a: { ro: "MIP · contul curent, media pe 3 ani", en: "MIP · current account, 3-year average", u: "% PIB", dec: 1, good: 1 },
   mip_reer3_a: { ro: "MIP · cursul real efectiv, variație pe 3 ani", en: "MIP · real effective exchange rate, 3-year change", u: "%", dec: 1, good: 0 },
   mip_ulc3_a: { ro: "MIP · costul unitar nominal al muncii, variație pe 3 ani", en: "MIP · nominal unit labour cost, 3-year change", u: "%", dec: 1, good: -1 },
-  mip_hpi_a: { ro: "MIP · prețurile locuințelor, variație reală", en: "MIP · house prices, real change", u: "%", dec: 1, good: 0 },
+  mip_hpi_a: { ro: "MIP · prețurile locuințelor, variație nominală", en: "MIP · house prices, nominal change", u: "%", dec: 1, good: 0 },
   population_a: { ro: "Populația la 1 ianuarie", en: "Population on 1 January", u: "pers", dec: 0, good: 0 },
   imf_gdp: { ro: "FMI · creșterea PIB real", en: "IMF · real GDP growth", u: "%", dec: 1, good: 1 },
   imf_cpi: { ro: "FMI · inflația medie (IPC)", en: "IMF · average inflation (CPI)", u: "%", dec: 1, good: -1 },

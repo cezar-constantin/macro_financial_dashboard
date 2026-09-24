@@ -4,6 +4,10 @@ name: Update macro data
 # and commits data/macro.json back to the branch the workflow ran on.
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - scripts/fetch_data.py
+      - .github/workflows/update-data.yml
   schedule:
     - cron: "17 6 3,18 * *" # twice a month, after the usual Eurostat release windows
 

@@ -1,0 +1,679 @@
+{
+ "generated": "2026-09-24T21:18:13Z",
+ "results": [
+  {
+   "id": "gdp_real_a",
+   "ok": true,
+   "series": {
+    "gdp_real_a": [
+     11,
+     "2025"
+    ],
+    "gdp_real_a_eu": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.8
+  },
+  {
+   "id": "gdp_nominal_a",
+   "ok": true,
+   "series": {
+    "gdp_nominal_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.4
+  },
+  {
+   "id": "gdp_nominal_ron_a",
+   "ok": true,
+   "series": {
+    "gdp_nominal_ron_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "gdp_yoy_q",
+   "ok": true,
+   "series": {
+    "gdp_yoy_q": [
+     46,
+     "2026-Q2"
+    ],
+    "gdp_yoy_q_eu": [
+     46,
+     "2026-Q2"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "gdp_qoq_q",
+   "ok": true,
+   "series": {
+    "gdp_qoq_q": [
+     46,
+     "2026-Q2"
+    ],
+    "gdp_qoq_q_eu": [
+     46,
+     "2026-Q2"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "contrib_cons_a",
+   "ok": true,
+   "series": {
+    "contrib_cons_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "contrib_gov_a",
+   "ok": true,
+   "series": {
+    "contrib_gov_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "contrib_gfcf_a",
+   "ok": true,
+   "series": {
+    "contrib_gfcf_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.9
+  },
+  {
+   "id": "contrib_inv_a",
+   "ok": true,
+   "series": {
+    "contrib_inv_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "contrib_nx_a",
+   "ok": false,
+   "error": "nama_10_gdp: empty response"
+  },
+  {
+   "id": "gdp_pc_pps_a",
+   "ok": true,
+   "series": {
+    "gdp_pc_pps_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "indprod_m",
+   "ok": true,
+   "series": {
+    "indprod_m": [
+     139,
+     "2026-07"
+    ],
+    "indprod_m_eu": [
+     139,
+     "2026-07"
+    ]
+   },
+   "sec": 1.0
+  },
+  {
+   "id": "retail_m",
+   "ok": true,
+   "series": {
+    "retail_m": [
+     139,
+     "2026-07"
+    ],
+    "retail_m_eu": [
+     139,
+     "2026-07"
+    ]
+   },
+   "sec": 0.8
+  },
+  {
+   "id": "constr_m",
+   "ok": true,
+   "series": {
+    "constr_m": [
+     139,
+     "2026-07"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "esi_m",
+   "ok": true,
+   "series": {
+    "esi_m": [
+     140,
+     "2026-08"
+    ],
+    "esi_m_eu": [
+     140,
+     "2026-08"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "cons_conf_m",
+   "ok": true,
+   "series": {
+    "cons_conf_m": [
+     140,
+     "2026-08"
+    ],
+    "cons_conf_m_eu": [
+     140,
+     "2026-08"
+    ]
+   },
+   "sec": 0.9
+  },
+  {
+   "id": "hicp_m",
+   "ok": true,
+   "series": {
+    "hicp_m": [
+     132,
+     "2025-12"
+    ],
+    "hicp_m_eu": [
+     132,
+     "2025-12"
+    ]
+   },
+   "sec": 0.8
+  },
+  {
+   "id": "hicp_core_m",
+   "ok": true,
+   "series": {
+    "hicp_core_m": [
+     132,
+     "2025-12"
+    ],
+    "hicp_core_m_eu": [
+     132,
+     "2025-12"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "hicp_food_m",
+   "ok": true,
+   "series": {
+    "hicp_food_m": [
+     132,
+     "2025-12"
+    ]
+   },
+   "sec": 0.8
+  },
+  {
+   "id": "hicp_energy_m",
+   "ok": true,
+   "series": {
+    "hicp_energy_m": [
+     132,
+     "2025-12"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "hpi_q",
+   "ok": true,
+   "series": {
+    "hpi_q": [
+     45,
+     "2026-Q1"
+    ],
+    "hpi_q_eu": [
+     45,
+     "2026-Q1"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "unemp_m",
+   "ok": true,
+   "series": {
+    "unemp_m": [
+     139,
+     "2026-07"
+    ],
+    "unemp_m_eu": [
+     139,
+     "2026-07"
+    ]
+   },
+   "sec": 0.8
+  },
+  {
+   "id": "unemp_youth_m",
+   "ok": true,
+   "series": {
+    "unemp_youth_m": [
+     138,
+     "2026-06"
+    ],
+    "unemp_youth_m_eu": [
+     139,
+     "2026-07"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "emp_rate_a",
+   "ok": true,
+   "series": {
+    "emp_rate_a": [
+     11,
+     "2025"
+    ],
+    "emp_rate_a_eu": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "lci_q",
+   "ok": true,
+   "series": {
+    "lci_q": [
+     46,
+     "2026-Q2"
+    ]
+   },
+   "sec": 0.8
+  },
+  {
+   "id": "ulc_a",
+   "ok": true,
+   "series": {
+    "ulc_a": [
+     11,
+     "2025"
+    ],
+    "ulc_a_eu": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.8
+  },
+  {
+   "id": "min_wage_s",
+   "ok": true,
+   "series": {
+    "min_wage_s": [
+     24,
+     "2026-S2"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "deficit_a",
+   "ok": true,
+   "series": {
+    "deficit_a": [
+     11,
+     "2025"
+    ],
+    "deficit_a_eu": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "debt_a",
+   "ok": true,
+   "series": {
+    "debt_a": [
+     11,
+     "2025"
+    ],
+    "debt_a_eu": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.4
+  },
+  {
+   "id": "debt_q",
+   "ok": true,
+   "series": {
+    "debt_q": [
+     45,
+     "2026-Q1"
+    ],
+    "debt_q_eu": [
+     45,
+     "2026-Q1"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "gov_rev_a",
+   "ok": true,
+   "series": {
+    "gov_rev_a": [
+     11,
+     "2025"
+    ],
+    "gov_rev_a_eu": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.8
+  },
+  {
+   "id": "gov_exp_a",
+   "ok": true,
+   "series": {
+    "gov_exp_a": [
+     11,
+     "2025"
+    ],
+    "gov_exp_a_eu": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.9
+  },
+  {
+   "id": "gov_int_a",
+   "ok": true,
+   "series": {
+    "gov_int_a": [
+     11,
+     "2025"
+    ],
+    "gov_int_a_eu": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "ca_gdp_q",
+   "ok": false,
+   "error": "bop_gdp6_q: filter leaves several categories in ['freq']"
+  },
+  {
+   "id": "ca_q",
+   "ok": false,
+   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=CA&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+  },
+  {
+   "id": "goods_q",
+   "ok": false,
+   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=G&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+  },
+  {
+   "id": "services_q",
+   "ok": false,
+   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=S&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+  },
+  {
+   "id": "primary_q",
+   "ok": false,
+   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=IN1&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+  },
+  {
+   "id": "secondary_q",
+   "ok": false,
+   "error": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/bop_c6_q?format=JSON&lang=EN&sinceTimePeriod=2015-Q1&geo=RO&bop_item=IN2&stk_flow=BAL&partner=WRL_REST&currency=MIO_EUR&s_adj=NSA&sector10=S1&sectpart=S1: HTTP Error 400: Bad Request"
+  },
+  {
+   "id": "niip_a",
+   "ok": true,
+   "series": {
+    "niip_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.9
+  },
+  {
+   "id": "irate3m_m",
+   "ok": true,
+   "series": {
+    "irate3m_m": [
+     140,
+     "2026-08"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "bond10y_m",
+   "ok": true,
+   "series": {
+    "bond10y_m": [
+     140,
+     "2026-08"
+    ]
+   },
+   "sec": 0.7
+  },
+  {
+   "id": "eurron_m_es",
+   "ok": true,
+   "series": {
+    "eurron_m_es": [
+     140,
+     "2026-08"
+    ]
+   },
+   "sec": 0.8
+  },
+  {
+   "id": "population_a",
+   "ok": true,
+   "series": {
+    "population_a": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "policy_rate_m",
+   "ok": true,
+   "series": {
+    "policy_rate_m": [
+     140,
+     "2026-08"
+    ]
+   },
+   "sec": 1.0
+  },
+  {
+   "id": "credit_gdp_q",
+   "ok": false,
+   "error": "https://stats.bis.org/api/v1/data/WS_TC/Q.RO.P.A.M.770.A/all?startPeriod=2015-01-01&detail=dataonly&format=csv: HTTP Error 404: "
+  },
+  {
+   "id": "credit_gap_q",
+   "ok": false,
+   "error": "https://stats.bis.org/api/v1/data/WS_CREDIT_GAP/Q.RO.P.A.C/all?startPeriod=2015-01-01&detail=dataonly&format=csv: HTTP Error 404: "
+  },
+  {
+   "id": "reer_m",
+   "ok": true,
+   "series": {
+    "reer_m": [
+     140,
+     "2026-08"
+    ]
+   },
+   "sec": 0.6
+  },
+  {
+   "id": "bnr_fx",
+   "ok": false,
+   "error": "syntax error: line 1, column 0"
+  },
+  {
+   "id": "imf_gdp",
+   "ok": true,
+   "series": {
+    "imf_gdp": [
+     17,
+     "2031"
+    ]
+   },
+   "sec": 8.5
+  },
+  {
+   "id": "imf_cpi",
+   "ok": true,
+   "series": {
+    "imf_cpi": [
+     17,
+     "2031"
+    ]
+   },
+   "sec": 9.9
+  },
+  {
+   "id": "imf_unemp",
+   "ok": true,
+   "series": {
+    "imf_unemp": [
+     17,
+     "2031"
+    ]
+   },
+   "sec": 9.4
+  },
+  {
+   "id": "imf_ca",
+   "ok": true,
+   "series": {
+    "imf_ca": [
+     17,
+     "2031"
+    ]
+   },
+   "sec": 9.8
+  },
+  {
+   "id": "imf_balance",
+   "ok": true,
+   "series": {
+    "imf_balance": [
+     17,
+     "2031"
+    ]
+   },
+   "sec": 10.3
+  },
+  {
+   "id": "imf_debt",
+   "ok": true,
+   "series": {
+    "imf_debt": [
+     17,
+     "2031"
+    ]
+   },
+   "sec": 8.6
+  },
+  {
+   "id": "wb_gdp_pc_usd",
+   "ok": true,
+   "series": {
+    "wb_gdp_pc_usd": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.5
+  },
+  {
+   "id": "wb_fdi_gdp",
+   "ok": true,
+   "series": {
+    "wb_fdi_gdp": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.3
+  },
+  {
+   "id": "wb_trade_gdp",
+   "ok": true,
+   "series": {
+    "wb_trade_gdp": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.3
+  },
+  {
+   "id": "wb_remit_gdp",
+   "ok": true,
+   "series": {
+    "wb_remit_gdp": [
+     11,
+     "2025"
+    ]
+   },
+   "sec": 0.3
+  },
+  {
+   "id": "ins_wage_m",
+   "ok": false,
+   "error": "INS FOM106E: no rows parsed; head=CAEN Rev.2  (activitati ale economiei nationale), Sexe, Macroregiuni  regiuni de dezvoltare si judete, Ani, UM: Lei  lei RON (incepand cu 2005), Valoare\nTOTAL, Total, TOTAL, Anul 2008, Lei, 1309\n"
+  }
+ ]
+}

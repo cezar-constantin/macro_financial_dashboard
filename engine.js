@@ -89,52 +89,66 @@ export function scoreboard(P) {
   const { to } = P;
   const rows = [];
   const add = (key, label, value, fmt, thrLabel, breach, note = "") => rows.push({ key, label, value, fmt, thrLabel, breach, note });
+  const official = (id) => lastObs(obsOf(id), to);
+  const offNote = L("valoare oficială Eurostat (tabloul MIP)", "official Eurostat value (MIP scoreboard)");
+  const calcNote = L("calculat din seriile tabloului de bord", "computed from the dashboard series");
   // current account, 3-year average
-  const ca = caAnnual();
-  const caY = Object.keys(ca).map(Number).filter((y) => y <= to);
-  if (caY.length >= 3) {
-    const y = Math.max(...caY);
-    const v = mean([ca[y], ca[y - 1], ca[y - 2]].filter(isNum));
-    add("ca3", L(`Contul curent, media ${y - 2}–${y}`, `Current account, ${y - 2}–${y} average`), v, pGDP, L("între −4 % și +6 %", "between −4% and +6%"), v < -4 || v > 6);
-  } else if (has("imf_ca")) {
-    const a = byYear(obsOf("imf_ca"));
-    const y = Math.min(to, new Date().getFullYear() - 1);
-    const v = mean([a[y], a[y - 1], a[y - 2]].filter(isNum));
-    add("ca3", L(`Contul curent, media ${y - 2}–${y} (FMI)`, `Current account, ${y - 2}–${y} average (IMF)`), v, pGDP, L("între −4 % și +6 %", "between −4% and +6%"), v < -4 || v > 6);
+  const ca3 = official("mip_ca3_a");
+  if (ca3) add("ca3", L(`Contul curent, media pe 3 ani (${+ca3[0] - 2}–${ca3[0]})`, `Current account, 3-year average (${+ca3[0] - 2}–${ca3[0]})`), ca3[1], pGDP, L("între −4 % și +6 %", "between −4% and +6%"), ca3[1] < -4 || ca3[1] > 6, offNote);
+  else {
+    const ca = caAnnual();
+    const caY = Object.keys(ca).map(Number).filter((y) => y <= to);
+    if (caY.length >= 3) {
+      const y = Math.max(...caY);
+      const v = mean([ca[y], ca[y - 1], ca[y - 2]].filter(isNum));
+      add("ca3", L(`Contul curent, media ${y - 2}–${y}`, `Current account, ${y - 2}–${y} average`), v, pGDP, L("între −4 % și +6 %", "between −4% and +6%"), v < -4 || v > 6, calcNote);
+    }
   }
   const niip = lastObs(obsOf("niip_a"), to);
-  if (niip) add("niip", L(`Poziția investițională internațională netă (${niip[0]})`, `Net international investment position (${niip[0]})`), niip[1], pGDP, "> −35 %", niip[1] < -35);
-  const reer = annualAvg(obsOf("reer_m"), { full: true });
-  const ry = Object.keys(reer).map(Number).filter((y) => y <= to);
-  if (ry.length >= 4) {
-    const y = Math.max(...ry);
-    const v = (reer[y] / reer[y - 3] - 1) * 100;
-    add("reer", L(`Cursul real efectiv, variație pe 3 ani (${y - 3}–${y})`, `Real effective exchange rate, 3-year change (${y - 3}–${y})`), v, (x) => sgn(x, 1) + " %", "±11 %", Math.abs(v) > 11, L("indicele BIS, deflatat cu IPC; MIP folosește 42 de parteneri", "BIS index, CPI-deflated; the MIP uses 42 partners"));
+  if (niip) add("niip", L(`Poziția investițională internațională netă (${niip[0]})`, `Net international investment position (${niip[0]})`), niip[1], pGDP, "> −35 %", niip[1] < -35, offNote);
+  const r3 = official("mip_reer3_a");
+  if (r3) add("reer", L(`Cursul real efectiv, variație pe 3 ani (${+r3[0] - 3}–${r3[0]})`, `Real effective exchange rate, 3-year change (${+r3[0] - 3}–${r3[0]})`), r3[1], (x) => sgn(x, 1) + " %", "±11 %", Math.abs(r3[1]) > 11, offNote);
+  else {
+    const reer = annualAvg(obsOf("reer_m"), { full: true });
+    const ry = Object.keys(reer).map(Number).filter((y) => y <= to);
+    if (ry.length >= 4) {
+      const y = Math.max(...ry);
+      const v = (reer[y] / reer[y - 3] - 1) * 100;
+      add("reer", L(`Cursul real efectiv, variație pe 3 ani (${y - 3}–${y})`, `Real effective exchange rate, 3-year change (${y - 3}–${y})`), v, (x) => sgn(x, 1) + " %", "±11 %", Math.abs(v) > 11, L("indicele BIS, deflatat cu IPC", "BIS index, CPI-deflated"));
+    }
   }
-  const ulc = byYear(obsOf("ulc_a"));
-  const uy = Object.keys(ulc).map(Number).filter((y) => y <= to);
-  if (uy.length >= 3) {
-    const y = Math.max(...uy);
-    const v = ((1 + ulc[y] / 100) * (1 + ulc[y - 1] / 100) * (1 + ulc[y - 2] / 100) - 1) * 100;
-    add("ulc", L(`Costul unitar nominal al muncii, variație pe 3 ani (${y - 2}–${y})`, `Nominal unit labour cost, 3-year change (${y - 2}–${y})`), v, (x) => sgn(x, 1) + " %", "< +12 %", v > 12);
+  const u3 = official("mip_ulc3_a");
+  if (u3) add("ulc", L(`Costul unitar nominal al muncii, variație pe 3 ani (${+u3[0] - 3}–${u3[0]})`, `Nominal unit labour cost, 3-year change (${+u3[0] - 3}–${u3[0]})`), u3[1], (x) => sgn(x, 1) + " %", "< +12 %", u3[1] > 12, offNote);
+  else {
+    const ulc = byYear(obsOf("ulc_a"));
+    const uy = Object.keys(ulc).map(Number).filter((y) => y <= to);
+    if (uy.length >= 3) {
+      const y = Math.max(...uy);
+      const v = ((1 + ulc[y] / 100) * (1 + ulc[y - 1] / 100) * (1 + ulc[y - 2] / 100) - 1) * 100;
+      add("ulc", L(`Costul unitar nominal al muncii, variație pe 3 ani (${y - 3}–${y})`, `Nominal unit labour cost, 3-year change (${y - 3}–${y})`), v, (x) => sgn(x, 1) + " %", "< +12 %", v > 12, calcNote);
+    }
   }
-  const hpi = annualAvg(obsOf("hpi_q"), { full: true });
-  const hicpA = annualAvg(obsOf("hicp_m"), { full: true });
-  const hy = Object.keys(hpi).map(Number).filter((y) => y <= to && isNum(hicpA[y]));
-  if (hy.length) {
-    const y = Math.max(...hy);
-    const v = ((1 + hpi[y] / 100) / (1 + hicpA[y] / 100) - 1) * 100;
-    add("hpi", L(`Prețurile locuințelor, variație reală (${y})`, `House prices, real change (${y})`), v, (x) => sgn(x, 1) + " %", "< +6 %", v > 6, L("deflatat cu IAPC", "HICP-deflated"));
+  const hr = official("mip_hpi_a");
+  if (hr) add("hpi", L(`Prețurile locuințelor, variație reală (${hr[0]})`, `House prices, real change (${hr[0]})`), hr[1], (x) => sgn(x, 1) + " %", "< +6 %", hr[1] > 6, offNote);
+  else {
+    const hpi = annualAvg(obsOf("hpi_q"), { full: true });
+    const hicpA = annualAvg(obsOf("hicp_m"), { full: true });
+    const hy = Object.keys(hpi).map(Number).filter((y) => y <= to && isNum(hicpA[y]));
+    if (hy.length) {
+      const y = Math.max(...hy);
+      const v = ((1 + hpi[y] / 100) / (1 + hicpA[y] / 100) - 1) * 100;
+      add("hpi", L(`Prețurile locuințelor, variație reală (${y})`, `House prices, real change (${y})`), v, (x) => sgn(x, 1) + " %", "< +6 %", v > 6, L("deflatat cu IAPC", "HICP-deflated"));
+    }
   }
   for (const [id, thr, lab] of [
     ["credit_gdp_a", 133, L("Datoria sectorului privat", "Private sector debt")],
     ["credit_flow_a", 14, L("Fluxul de credit către sectorul privat", "Private sector credit flow")],
   ]) {
     const o = lastObs(obsOf(id), to);
-    if (o) add(id, `${lab} (${o[0]})`, o[1], pGDP, `< ${thr} %`, o[1] > thr);
+    if (o) add(id, `${lab} (${o[0]})`, o[1], pGDP, `< ${thr} %`, o[1] > thr, offNote);
   }
   const debt = lastObs(obsOf("debt_a"), to);
-  if (debt) add("debt", L(`Datoria publică (${debt[0]})`, `Government debt (${debt[0]})`), debt[1], pGDP, "< 60 %", debt[1] > 60);
+  if (debt) add("debt", L(`Datoria publică (${debt[0]})`, `Government debt (${debt[0]})`), debt[1], pGDP, "< 60 %", debt[1] > 60, offNote);
   const un = annualAvg(obsOf("unemp_m"), { full: true });
   const uny = Object.keys(un).map(Number).filter((y) => y <= to);
   if (uny.length >= 3) {

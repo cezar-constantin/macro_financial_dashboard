@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analiza generată · Macroeconomia României</title>
+    <meta name="description" content="Analiză macroeconomică a României generată în browser, pentru perioada aleasă, cu tabloul dezechilibrelor și întrebări de seminar." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./macro.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <nav class="card site-nav" id="site-nav" aria-label="Site"></nav>
+
+      <header class="hero card">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="r.eyebrow"></p>
+          <h1 class="compact" data-i18n="r.title"></h1>
+          <p class="hero-text" data-i18n="r.text"></p>
+        </div>
+        <div class="hero-badges">
+          <article class="metric-chip"><span class="metric-label" data-i18n="p.kicker"></span><strong id="hero-period">—</strong></article>
+          <article class="metric-chip"><span class="metric-label" data-i18n="r.hero.mip"></span><strong id="hero-mip">—</strong></article>
+          <article class="metric-chip"><span class="metric-label" data-i18n="home.risks"></span><strong id="hero-risks">—</strong></article>
+        </div>
+      </header>
+
+      <main id="workspace" aria-live="polite">
+        <section class="card panel-card">
+          <div class="empty-state"><strong data-i18n="status.loading"></strong></div>
+        </section>
+      </main>
+
+      <section class="footer-panel-grid" id="site-footer"></section>
+    </div>
+
+    <div class="toast" id="toast" hidden></div>
+    <script type="module" src="./analiza.js"></script>
+  </body>
+</html>

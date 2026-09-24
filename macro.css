@@ -1,0 +1,56 @@
+/* Additions for the macroeconomic dashboard. The base visual language lives unchanged in styles.css. */
+.tool-grid.three-up { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.tool-card .primary-button, .tool-card .ghost-button { justify-self: start; padding: 0 22px; text-decoration: none; }
+
+.period-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: stretch; margin-bottom: 14px; }
+.period-row .field-card { min-width: 150px; padding: 10px 14px; }
+.period-row .check-card { display: flex; align-items: center; gap: 10px; }
+.period-row .check-card input { width: 20px; height: 20px; accent-color: var(--blue); }
+.theme-jump { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.theme-jump .flow-chip { text-decoration: none; }
+.period-card .tab-button { min-height: 40px; padding: 8px 16px; }
+
+.kpi-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.kpi-tile svg { display: block; margin: 4px 0 2px; }
+
+.theme-section { display: grid; gap: 16px; scroll-margin-top: 16px; }
+.theme-heading .section-kicker { font-size: 0.95rem; margin: 6px 0 0 6px; }
+.chart-card { display: grid; gap: 12px; align-content: start; }
+.chart-card h3 { margin: 0 0 4px; }
+.legend-chip.is-dashed::before { background: repeating-linear-gradient(90deg, var(--legend-color) 0 4px, transparent 4px 7px); border-radius: 2px; height: 3px; width: 16px; }
+
+.report h4 { font-size: 1.2rem; }
+.report p { margin: 0 0 10px; line-height: 1.7; color: var(--ink); }
+.report-section { padding: 16px 18px; border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.78); border: 1px solid rgba(163, 180, 235, 0.28); }
+.report-section .section-kicker { margin: 0 0 2px; }
+.report ol { margin: 0; padding-left: 20px; line-height: 1.6; }
+.risk-list li::marker { color: #b0491b; }
+.gen-steps { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; color: var(--muted); }
+.gen-steps li::before { content: "○ "; }
+.gen-steps li.done { color: #1b6f3a; }
+.gen-steps li.done::before { content: "✓ "; }
+.gen-steps li.active { color: var(--blue-deep); font-weight: 700; }
+.gen-steps li.active::before { content: "◐ "; }
+.prompt-box { width: 100%; min-height: 320px; resize: vertical; padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--line-strong); background: #fff; color: var(--ink); }
+.fact-table td:first-child { white-space: nowrap; }
+
+.muted { color: var(--muted); }
+.mono { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; }
+.mono a { color: inherit; }
+.catalogue-scroll { max-height: 640px; overflow: auto; }
+.plain-list { margin: 0 0 12px; padding-left: 20px; line-height: 1.65; }
+.plain-list li { margin-bottom: 6px; }
+.data-table td.num, .data-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 1120px) {
+  .tool-grid.three-up { grid-template-columns: 1fr; }
+  .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .kpi-row { grid-template-columns: 1fr; }
+  .period-row .field-card { flex: 1 1 120px; }
+}
+@media print {
+  .site-nav, .period-card, #site-footer, .button-row, .prompt-box { display: none !important; }
+}
+#workspace { display: grid; gap: 22px; }

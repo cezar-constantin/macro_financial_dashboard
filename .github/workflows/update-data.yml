@@ -1,0 +1,40 @@
+name: Update macro data
+
+# Downloads the series from Eurostat, BNR, BIS, IMF, World Bank and INS (scripts/fetch_data.py)
+# and commits data/macro.json back to the branch the workflow ran on.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 3,18 * *" # twice a month, after the usual Eurostat release windows
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download series
+        run: python3 scripts/fetch_data.py
+
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/macro.json data/fetch_log.json
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "Actualizare date macro $(date -u +%Y-%m-%d)"
+            git push
+          fi

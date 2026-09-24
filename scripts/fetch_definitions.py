@@ -46,6 +46,12 @@ GLOSSARY = [
     "Effective exchange rate", "Private sector debt", "Private sector credit flow", "Macroeconomic imbalance procedure (MIP)",
     "Excessive deficit procedure (EDP)", "Population", "Stability and growth pact", "European system of accounts (ESA)",
     "Consumer price index (CPI)", "ILO", "International Labour Organisation (ILO)", "Labour force", "Remittances",
+    "Constant price GDP", "GDP per capita in purchasing power standards", "Household final consumption expenditure (HFCE)", "Export",
+    "Import", "Exports - NA", "Imports - NA", "Volume of sales index", "Volume of industrial production", "Retail trade", "Confidence indicator",
+    "Business and consumer confidence", "Labour cost", "Budget deficit", "Public deficit", "Deficit", "Current transfers",
+    "Central bank interest rate", "Bond yields", "Nominal effective exchange rate", "Real effective exchange rate", "Credit",
+    "Labour productivity", "Compensation of employees", "International Investment Position", "Goods and services account",
+    "Trade deficit", "Gross capital formation", "EURIBOR", "Chain index", "Government gross debt", "Public debt",
 ]
 
 WB = ["NY.GDP.PCAP.CD", "BX.KLT.DINV.WD.GD.ZS", "NE.TRD.GNFS.ZS", "BX.TRF.PWKR.DT.GD.ZS"]
@@ -138,6 +144,52 @@ def glossary_index() -> list[str]:
     return titles
 
 
+def esms_concepts(html: str) -> str:
+    """Text of the 'Statistical concepts and definitions' section of a Euro SDMX metadata page."""
+    txt = re.sub(r"<script.*?</script>|<style.*?</style>", "", html, flags=re.S)
+    txt = re.sub(r"<br\s*/?>|</p>|</div>|</li>|</tr>", "\n", txt)
+    txt = re.sub(r"<[^>]+>", "", txt)
+    txt = re.sub(r"&nbsp;", " ", txt)
+    txt = re.sub(r"&amp;", "&", txt)
+    txt = re.sub(r"[ \t]+", " ", txt)
+    txt = re.sub(r"\n\s*\n+", "\n", txt)
+    m = re.search(r"Statistical concepts and definitions(.*?)(?:\n\s*3\.5|\n\s*Statistical unit)", txt, re.S)
+    return (m.group(1) if m else "").strip()[:5000]
+
+
+def eurostat_datasets() -> dict:
+    from fetch_data import CATALOGUE, EUROSTAT
+    out = {}
+    seen_esms = {}
+    for spec in CATALOGUE:
+        if spec["src"] != "eurostat":
+            continue
+        ds, f = spec["ds"], spec["f"]
+        rec = {"ds": ds, "filters": f}
+        try:
+            q = [("format", "JSON"), ("lang", "EN"), ("geo", "RO"), ("lastTimePeriod", "1")] + list(f.items())
+            js = json.loads(http_get(EUROSTAT + ds + "?" + urllib.parse.urlencode(q), tries=2))
+            rec["dataset_label"] = js.get("label")
+            rec["labels"] = {d: list(js["dimension"][d]["category"].get("label", {}).values()) for d in js["id"] if d not in ("geo", "time", "freq")}
+        except Exception as e:  # noqa: BLE001
+            rec["labels_error"] = str(e)[:200]
+        try:
+            xml = http_get(f"https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/dataflow/ESTAT/{ds.upper()}", tries=2).decode("utf-8", "replace")
+            m = re.search(r"<common:AnnotationType>ESMS_HTML</common:AnnotationType>.*?<common:AnnotationURL>(.*?)</common:AnnotationURL>", xml, re.S) or \
+                re.search(r"(https://ec\.europa\.eu/eurostat/cache/metadata/en/[a-z0-9_]+_esms\.htm)", xml)
+            if m:
+                url = m.group(1)
+                rec["esms_url"] = url
+                if url not in seen_esms:
+                    seen_esms[url] = esms_concepts(http_get(url, tries=2).decode("utf-8", "replace"))
+                rec["esms_concepts"] = seen_esms[url]
+        except Exception as e:  # noqa: BLE001
+            rec["esms_error"] = str(e)[:200]
+        out[spec["id"]] = rec
+        print("DS", spec["id"], rec.get("dataset_label"), rec.get("esms_url"), len(rec.get("esms_concepts", "")))
+    return out
+
+
 def main():
     out = {"eurostat_glossary": {}, "eurostat_glossary_missing": [], "worldbank": {}, "imf": {}, "ins": {}, "bis": {}}
     idx = glossary_index()
@@ -162,6 +214,7 @@ def main():
                 found[h] = {**r, "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=" + urllib.parse.quote(r["title"].replace(" ", "_"))}
         out["eurostat_search"][term] = found
         print("SEARCH", term, "->", list(found))
+    out["eurostat_datasets"] = eurostat_datasets()
     for code in WB:
         try:
             js = json.loads(http_get(f"https://api.worldbank.org/v2/indicator/{code}?format=json"))

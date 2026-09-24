@@ -153,8 +153,13 @@ def esms_concepts(html: str) -> str:
     txt = re.sub(r"&amp;", "&", txt)
     txt = re.sub(r"[ \t]+", " ", txt)
     txt = re.sub(r"\n\s*\n+", "\n", txt)
-    m = re.search(r"Statistical concepts and definitions(.*?)(?:\n\s*3\.5|\n\s*Statistical unit)", txt, re.S)
-    return (m.group(1) if m else "").strip()[:5000]
+    # the section starts at the last heading occurrence (the first ones are in the table of contents)
+    starts = [m.end() for m in re.finditer(r"Statistical concepts and definitions", txt)]
+    if not starts:
+        return txt.strip()[:20000]
+    body = txt[starts[-1]:]
+    end = re.search(r"\n\s*(?:3\.5\.?\s*)?Statistical unit", body)
+    return body[: end.start() if end else 6000].strip()[:6000]
 
 
 def eurostat_datasets() -> dict:

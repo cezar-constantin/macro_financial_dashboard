@@ -121,17 +121,22 @@ def bnr_fx() -> dict[str, list]:
     ns = {"b": "http://www.bnr.ro/xsd"}
     monthly: dict[str, dict[str, dict]] = {"EUR": defaultdict(dict), "USD": defaultdict(dict)}
     this_year = dt.date.today().year
+    hosts = ["https://curs.bnr.ro", "https://www.bnr.ro"]
     for y in range(START_YEAR, this_year + 1):
-        url = f"https://www.bnr.ro/files/xml/years/nbrfxrates{y}.xml"
-        if y == this_year:
-            url = "https://www.bnr.ro/nbrfxrates10days.xml"  # current year file may lag; merged below
-            try:
-                root = ET.fromstring(http_get(f"https://www.bnr.ro/files/xml/years/nbrfxrates{y}.xml"))
-                _bnr_collect(root, ns, monthly)
-            except Exception:
-                pass
-        root = ET.fromstring(http_get(url))
-        _bnr_collect(root, ns, monthly)
+        paths = [f"/files/xml/years/nbrfxrates{y}.xml"] + (["/nbrfxrates10days.xml"] if y == this_year else [])
+        for path in paths:
+            errs = []
+            for h in hosts:
+                try:
+                    raw = http_get(h + path, tries=2)
+                    if not raw.lstrip().startswith(b"<?xml") and b"<DataSet" not in raw[:500]:
+                        raise RuntimeError("HTML instead of XML (anti-bot page)")
+                    _bnr_collect(ET.fromstring(raw), ns, monthly)
+                    break
+                except Exception as e:  # noqa: BLE001
+                    errs.append(f"{h}{path}: {str(e)[:120]}")
+            else:
+                raise RuntimeError("; ".join(errs))
     out = {}
     for cur, m in monthly.items():
         out[cur] = [[k, round(sum(v.values()) / len(v), 4)] for k, v in sorted(m.items())]
@@ -170,8 +175,8 @@ INS = "http://statistici.insse.ro:8077/tempo-ins/"
 
 
 def ins_wage() -> list:
-    """Net average monthly earnings, total economy (INS TEMPO matrix FOM106E), lei."""
-    code = "FOM106E"
+    """Net average monthly earnings, total economy (INS TEMPO matrix FOM106D, monthly), lei."""
+    code = "FOM106D"
     meta = json.loads(http_get(INS + "matrix/" + code, timeout=60))
     dims = meta["dimensionsMap"]
     enc = []
@@ -220,7 +225,7 @@ def ins_wage() -> list:
             continue
         obs.append([f"{y}-{m:02d}", v])
     if not obs:
-        raise RuntimeError("INS FOM106E: no rows parsed; head=" + txt[:300])
+        raise RuntimeError("INS FOM106D: no rows parsed; head=" + txt[:300])
     return sorted(obs)
 
 
@@ -239,7 +244,7 @@ CATALOGUE = [
     dict(id="contrib_gov_a", src=E, ds="nama_10_gdp", f=dict(unit="CON_PPCH_PRE", na_item="P3_S13"), freq="A", unit="pp"),
     dict(id="contrib_gfcf_a", src=E, ds="nama_10_gdp", f=dict(unit="CON_PPCH_PRE", na_item="P51G"), freq="A", unit="pp"),
     dict(id="contrib_inv_a", src=E, ds="nama_10_gdp", f=dict(unit="CON_PPCH_PRE", na_item="P52_P53"), freq="A", unit="pp"),
-    dict(id="contrib_nx_a", src=E, ds="nama_10_gdp", f=dict(unit="CON_PPCH_PRE", na_item="B11"), freq="A", unit="pp"),
+    dict(id="contrib_nx_a", src=E, ds="nama_10_gdp", f=dict(unit="CON_PPCH_PRE", na_item="P6X7"), freq="A", unit="pp"),
     dict(id="gdp_pc_pps_a", src=E, ds="nama_10_pc", f=dict(unit="PC_EU27_2020_HAB_MPPS_CP", na_item="B1GQ"), freq="A", unit="UE27=100"),
     dict(id="indprod_m", src=E, ds="sts_inpr_m", f=dict(indic_bt="PRD", nace_r2="B-D", s_adj="CA", unit="PCH_SM"), freq="M", unit="%", eu=True),
     dict(id="retail_m", src=E, ds="sts_trtu_m", f=dict(indic_bt="VOL_SLS", nace_r2="G47", s_adj="CA", unit="PCH_SM"), freq="M", unit="%", eu=True),
@@ -248,13 +253,13 @@ CATALOGUE = [
     dict(id="cons_conf_m", src=E, ds="ei_bsco_m", f=dict(indic="BS-CSMCI", s_adj="SA", unit="BAL"), freq="M", unit="sold", eu=True),
     # --- prices
     dict(id="hicp_m", src=E, ds="prc_hicp_manr", f=dict(unit="RCH_A", coicop="CP00"), freq="M", unit="%", eu=True,
-         alt_ds=[("prc_hicp_minr", dict(unit="RCH_A", coicop18="TOTAL"))]),
+         extend=[("prc_hicp_minr", dict(unit="RCH_A", coicop18="TOTAL"))]),
     dict(id="hicp_core_m", src=E, ds="prc_hicp_manr", f=dict(unit="RCH_A", coicop="TOT_X_NRG_FOOD"), freq="M", unit="%", eu=True,
-         alt_ds=[("prc_hicp_minr", dict(unit="RCH_A", coicop18="TOT_X_NRG_FOOD"))]),
+         extend=[("prc_hicp_minr", dict(unit="RCH_A", coicop18="TOT_X_NRG_FOOD"))]),
     dict(id="hicp_food_m", src=E, ds="prc_hicp_manr", f=dict(unit="RCH_A", coicop="FOOD"), freq="M", unit="%",
-         alt_ds=[("prc_hicp_minr", dict(unit="RCH_A", coicop18="FOOD"))]),
+         extend=[("prc_hicp_minr", dict(unit="RCH_A", coicop18="FOOD"))]),
     dict(id="hicp_energy_m", src=E, ds="prc_hicp_manr", f=dict(unit="RCH_A", coicop="NRG"), freq="M", unit="%",
-         alt_ds=[("prc_hicp_minr", dict(unit="RCH_A", coicop18="NRG"))]),
+         extend=[("prc_hicp_minr", dict(unit="RCH_A", coicop18="NRG"))]),
     dict(id="hpi_q", src=E, ds="prc_hpi_q", f=dict(purchase="TOTAL", unit="RCH_A"), freq="Q", unit="%", eu=True),
     # --- labour
     dict(id="unemp_m", src=E, ds="une_rt_m", f=dict(s_adj="SA", age="TOTAL", sex="T", unit="PC_ACT"), freq="M", unit="%", eu=True),
@@ -271,13 +276,20 @@ CATALOGUE = [
     dict(id="gov_exp_a", src=E, ds="gov_10a_main", f=dict(na_item="TE", sector="S13", unit="PC_GDP"), freq="A", unit="% PIB", eu=True),
     dict(id="gov_int_a", src=E, ds="gov_10a_main", f=dict(na_item="D41PAY", sector="S13", unit="PC_GDP"), freq="A", unit="% PIB", eu=True),
     # --- external
-    dict(id="ca_gdp_q", src=E, ds="bop_gdp6_q", f=dict(bop_item="CA", stk_flow="BAL", partner="WRL_REST", unit="PC_GDP", s_adj="NSA"), freq="Q", unit="% PIB"),
-    dict(id="ca_q", src=E, ds="bop_c6_q", f=dict(bop_item="CA", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", s_adj="NSA", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
-    dict(id="goods_q", src=E, ds="bop_c6_q", f=dict(bop_item="G", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", s_adj="NSA", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
-    dict(id="services_q", src=E, ds="bop_c6_q", f=dict(bop_item="S", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", s_adj="NSA", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
-    dict(id="primary_q", src=E, ds="bop_c6_q", f=dict(bop_item="IN1", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", s_adj="NSA", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
-    dict(id="secondary_q", src=E, ds="bop_c6_q", f=dict(bop_item="IN2", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", s_adj="NSA", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
+    dict(id="ca_gdp_q", src=E, ds="bop_gdp6_q", f=dict(freq="Q", bop_item="CA", stk_flow="BAL", partner="WRL_REST", unit="PC_GDP", s_adj="NSA"), freq="Q", unit="% PIB"),
+    dict(id="ca_q", src=E, ds="bop_c6_q", f=dict(bop_item="CA", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
+    dict(id="goods_q", src=E, ds="bop_c6_q", f=dict(bop_item="G", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
+    dict(id="services_q", src=E, ds="bop_c6_q", f=dict(bop_item="S", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
+    dict(id="primary_q", src=E, ds="bop_c6_q", f=dict(bop_item="IN1", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
+    dict(id="secondary_q", src=E, ds="bop_c6_q", f=dict(bop_item="IN2", stk_flow="BAL", partner="WRL_REST", currency="MIO_EUR", sector10="S1", sectpart="S1"), freq="Q", unit="mil. EUR"),
     dict(id="niip_a", src=E, ds="tipsii10", f=dict(unit="PC_GDP", stk_flow="N_LE", bop_item="FA", partner="WRL_REST", sector10="S1", sectpart="S1"), freq="A", unit="% PIB"),
+    # --- MIP scoreboard (official Eurostat computations) and private sector credit
+    dict(id="mip_ca3_a", src=E, ds="tipsbp10", f=dict(unit="PC_GDP_3Y", s_adj="NSA", bop_item="CA", stk_flow="BAL", partner="WRL_REST"), freq="A", unit="% PIB"),
+    dict(id="mip_reer3_a", src=E, ds="tipser10", f=dict(unit="PCH_3Y"), freq="A", unit="%"),
+    dict(id="mip_ulc3_a", src=E, ds="tipslm10", f=dict(na_item="NULC_HW", unit="PCH_3Y"), freq="A", unit="%"),
+    dict(id="mip_hpi_a", src=E, ds="tipsho20", f=dict(unit="RCH_A_AVG"), freq="A", unit="%"),
+    dict(id="credit_gdp_a", src=E, ds="tipspd20", f=dict(unit="PC_GDP"), freq="A", unit="% PIB"),
+    dict(id="credit_flow_a", src=E, ds="tipspc20", f=dict(unit="PC_GDP"), freq="A", unit="% PIB"),
     # --- financial
     dict(id="irate3m_m", src=E, ds="irt_st_m", f=dict(int_rt="IRT_M3"), freq="M", unit="%"),
     dict(id="bond10y_m", src=E, ds="irt_lt_mcby_m", f=dict(int_rt="MCBY"), freq="M", unit="%"),
@@ -286,8 +298,6 @@ CATALOGUE = [
     dict(id="population_a", src=E, ds="demo_pjan", f=dict(age="TOTAL", sex="T", unit="NR"), freq="A", unit="persoane"),
     # --- BIS (policy rate from BNR decisions, credit, REER, property prices)
     dict(id="policy_rate_m", src="bis", flow="WS_CBPOL", key="M.RO", freq="M", unit="%"),
-    dict(id="credit_gdp_q", src="bis", flow="WS_TC", key="Q.RO.P.A.M.770.A", freq="Q", unit="% PIB"),
-    dict(id="credit_gap_q", src="bis", flow="WS_CREDIT_GAP", key="Q.RO.P.A.C", freq="Q", unit="pp"),
     dict(id="reer_m", src="bis", flow="WS_EER", key="M.R.B.RO", freq="M", unit="2020=100"),
     # --- BNR
     dict(id="bnr_fx", src="bnr", freq="M", unit="RON"),
@@ -334,6 +344,18 @@ def fetch_one(spec: dict) -> dict[str, dict]:
                     res = eurostat(ds, f, geos, spec["freq"])
                 meta = {**base, "code": ds + " · " + ", ".join(f"{k}={v}" for k, v in f.items()),
                         "url": eurostat_url(ds, f)}
+                for ext_ds, ext_f in spec.get("extend", []):
+                    # a newer dataset continues the series (e.g. HICP moved to COICOP 2018 in 2026)
+                    try:
+                        ext = eurostat(ext_ds, ext_f, geos, spec["freq"])
+                        for g in list(res):
+                            lastp = res[g][-1][0] if res[g] else ""
+                            res[g] = res[g] + [o for o in ext.get(g, []) if o[0] > lastp]
+                        meta_ext = f" + {ext_ds} · " + ", ".join(f"{k}={v}" for k, v in ext_f.items())
+                    except Exception as e:  # noqa: BLE001
+                        meta_ext = ""
+                        print(f"     extend {ext_ds} failed: {str(e)[:200]}", flush=True)
+                    meta["code"] += meta_ext
                 if "RO" in res:
                     out[spec["id"]] = {**meta, "obs": res["RO"]}
                 if "EU27_2020" in res:
@@ -346,7 +368,7 @@ def fetch_one(spec: dict) -> dict[str, dict]:
     if src == "bis":
         obs = bis(spec["flow"], spec["key"])
         return {spec["id"]: {**base, "code": f"{spec['flow']} · {spec['key']}",
-                             "url": f"https://data.bis.org/topics/{ {'WS_CBPOL': 'CBPOL', 'WS_TC': 'TOTAL_CREDIT', 'WS_CREDIT_GAP': 'CREDIT_GAPS', 'WS_EER': 'EER'}[spec['flow']] }",
+                             "url": "https://data.bis.org/topics/" + {"WS_CBPOL": "CBPOL", "WS_EER": "EER"}[spec["flow"]],
                              "obs": obs}}
     if src == "bnr":
         fx = bnr_fx()
@@ -359,7 +381,7 @@ def fetch_one(spec: dict) -> dict[str, dict]:
     if src == "wb":
         return {spec["id"]: {**base, "code": f"WDI · {spec['ind']}", "url": f"https://data.worldbank.org/indicator/{spec['ind']}?locations=RO", "obs": worldbank(spec["ind"])}}
     if src == "ins":
-        return {spec["id"]: {**base, "code": "TEMPO · FOM106E", "url": "http://statistici.insse.ro:8077/tempo-online/#/pages/tables/insse-table", "obs": ins_wage()}}
+        return {spec["id"]: {**base, "code": "TEMPO · FOM106D", "url": "http://statistici.insse.ro:8077/tempo-online/#/pages/tables/insse-table", "obs": ins_wage()}}
     raise ValueError(src)
 
 

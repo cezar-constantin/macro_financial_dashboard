@@ -7,6 +7,7 @@ on:
   push:
     paths:
       - scripts/fetch_data.py
+      - scripts/probe.py
       - .github/workflows/update-data.yml
   schedule:
     - cron: "17 6 3,18 * *" # twice a month, after the usual Eurostat release windows
@@ -27,6 +28,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Probe dataset codes (temporary)
+        continue-on-error: true
+        run: python3 scripts/probe.py
 
       - name: Download series
         run: python3 scripts/fetch_data.py

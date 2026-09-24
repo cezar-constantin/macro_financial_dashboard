@@ -84,10 +84,48 @@ def se_extract(title: str) -> dict | None:
         return None
 
 
+SEARCH = [
+    "real GDP growth", "chain-linked volumes", "volume index of GDP per capita", "household final consumption expenditure",
+    "government final consumption expenditure", "net exports", "exports of goods and services", "imports of goods and services",
+    "retail trade", "consumer confidence indicator", "core inflation", "unit labour cost", "government deficit", "government revenue",
+    "government expenditure", "secondary income", "goods balance of payments", "services balance of payments", "international investment position",
+    "money market interest rate", "long-term interest rate", "real effective exchange rate", "private sector debt", "private sector credit flow",
+    "macroeconomic imbalance procedure", "European system of accounts", "interest payable", "minimum wages", "ROBOR",
+]
+
+
+def glossary_ns() -> int | None:
+    try:
+        js = json.loads(http_get(SE + "?action=query&meta=siteinfo&siprop=namespaces&format=json", tries=2))
+        for ns in js["query"]["namespaces"].values():
+            if (ns.get("*") or ns.get("name") or "").lower() == "glossary":
+                return int(ns["id"])
+    except Exception as e:  # noqa: BLE001
+        print("siteinfo failed", str(e)[:150])
+    return None
+
+
+def search(term: str, ns) -> list[str]:
+    q = {"action": "query", "list": "search", "srsearch": term, "srlimit": "5", "format": "json"}
+    if ns is not None:
+        q["srnamespace"] = str(ns)
+    try:
+        js = json.loads(http_get(SE + "?" + urllib.parse.urlencode(q), tries=2))
+        return [h["title"] for h in js.get("query", {}).get("search", [])]
+    except Exception as e:  # noqa: BLE001
+        print("search failed", term, str(e)[:150])
+        return []
+
+
 def glossary_index() -> list[str]:
     titles, cont = [], {}
+    ns = glossary_ns()
     while True:
-        q = {"action": "query", "list": "allpages", "apprefix": "Glossary:", "aplimit": "500", "format": "json", **cont}
+        q = {"action": "query", "list": "allpages", "aplimit": "500", "format": "json", **cont}
+        if ns is not None:
+            q["apnamespace"] = str(ns)
+        else:
+            q["apprefix"] = "Glossary:"
         try:
             js = json.loads(http_get(SE + "?" + urllib.parse.urlencode(q), tries=2))
         except Exception as e:  # noqa: BLE001
@@ -113,6 +151,17 @@ def main():
         else:
             out["eurostat_glossary_missing"].append(t)
             print("MISS", t)
+    ns = glossary_ns()
+    out["eurostat_search"] = {}
+    for term in SEARCH:
+        hits = search(term, ns)
+        found = {}
+        for h in hits[:3]:
+            r = se_extract(h.split(":", 1)[1] if h.startswith("Glossary:") else h)
+            if r:
+                found[h] = {**r, "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=" + urllib.parse.quote(r["title"].replace(" ", "_"))}
+        out["eurostat_search"][term] = found
+        print("SEARCH", term, "->", list(found))
     for code in WB:
         try:
             js = json.loads(http_get(f"https://api.worldbank.org/v2/indicator/{code}?format=json"))

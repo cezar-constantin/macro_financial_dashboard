@@ -244,7 +244,6 @@ CATALOGUE = [
     dict(id="contrib_gov_a", src=E, ds="nama_10_gdp", f=dict(unit="CON_PPCH_PRE", na_item="P3_S13"), freq="A", unit="pp"),
     dict(id="contrib_gfcf_a", src=E, ds="nama_10_gdp", f=dict(unit="CON_PPCH_PRE", na_item="P51G"), freq="A", unit="pp"),
     dict(id="contrib_inv_a", src=E, ds="nama_10_gdp", f=dict(unit="CON_PPCH_PRE", na_item="P52_P53"), freq="A", unit="pp"),
-    dict(id="contrib_nx_a", src=E, ds="nama_10_gdp", f=dict(unit="CON_PPCH_PRE", na_item="P6X7"), freq="A", unit="pp"),
     dict(id="gdp_pc_pps_a", src=E, ds="nama_10_pc", f=dict(unit="PC_EU27_2020_HAB_MPPS_CP", na_item="B1GQ"), freq="A", unit="UE27=100"),
     dict(id="indprod_m", src=E, ds="sts_inpr_m", f=dict(indic_bt="PRD", nace_r2="B-D", s_adj="CA", unit="PCH_SM"), freq="M", unit="%", eu=True),
     dict(id="retail_m", src=E, ds="sts_trtu_m", f=dict(indic_bt="VOL_SLS", nace_r2="G47", s_adj="CA", unit="PCH_SM"), freq="M", unit="%", eu=True),

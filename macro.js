@@ -375,7 +375,7 @@ export function unitLabel(u) {
 /** Value with unit, short form used in cards, tooltips and the report. */
 export function fmtU(v, u, dec = 1) {
   if (!isNum(v)) return "—";
-  if (u === "%" || u === "% PIB") return nf(v, dec) + (u === "%" ? " %" : L(" % din PIB", " % of GDP"));
+  if (u === "%" || u === "% PIB") return nf(v, dec) + (u === "%" ? L(" %", "%") : L(" % din PIB", "% of GDP"));
   if (u === "pp") return sgn(v, dec) + " pp";
   if (u === "meur") return Math.abs(v) >= 1000 ? nf(v / 1000, 1) + L(" mld. EUR", " EUR bn") : nf(v, 0) + L(" mil. EUR", " EUR m");
   if (u === "mron") return nf(v / 1000, 1) + L(" mld. lei", " RON bn");
@@ -473,6 +473,14 @@ export function caRolling() {
     if (isNum(g)) out.push([q[i][0], (100 * s) / g]);
   }
   return out;
+}
+/** EUR/RON: BNR monthly averages, extended with Eurostat's monthly average for months the BNR files do not cover yet. */
+export function fxEur() {
+  const bnr = obsOf("eurron_m"),
+    es = obsOf("eurron_m_es");
+  if (!bnr.length) return es;
+  const last = bnr[bnr.length - 1][0];
+  return bnr.concat(es.filter(([p]) => p > last));
 }
 export const toObs = (obj) => Object.entries(obj).map(([y, v]) => [String(y), v]).sort();
 
@@ -703,9 +711,15 @@ export function tsChart(series, from, to, opts = {}) {
       });
     }
     svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.width || 2.2}"${s.dash ? ` stroke-dasharray="${s.dash}"` : ""} stroke-linejoin="round" stroke-linecap="round"/>`;
-    const r = xy.length > 60 ? 2.2 : xy.length > 20 ? 3 : 4.2;
+    // dense series: invisible hover targets only; sparse series: visible markers
+    const dense = xy.length > 30;
+    const r = dense ? 3.5 : 4.2;
     for (const [x, y, p, v] of xy)
-      svg += `<g class="hover-target"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${s.color}" stroke="#fff" stroke-width="${r > 3 ? 1.5 : 0.8}"${s.dash ? ' opacity="0.8"' : ""}><title>${E(fmtPeriod(p))} · ${E(s.label)}: ${E(fmt(v))}</title></circle></g>`;
+      svg += `<g class="hover-target"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${dense ? "transparent" : s.color}" stroke="${dense ? "none" : "#fff"}" stroke-width="1.5"${s.dash ? ' opacity="0.8"' : ""}><title>${E(fmtPeriod(p))} · ${E(s.label)}: ${E(fmt(v))}</title></circle></g>`;
+    if (dense) {
+      const [lx, ly] = xy[xy.length - 1];
+      svg += `<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="3.6" fill="${s.color}" stroke="#fff" stroke-width="1.5"/>`;
+    }
   });
   svg += `<line class="axis-line" x1="${padL}" x2="${W - padR}" y1="${padT + ph}" y2="${padT + ph}"/>`;
   svg += `</svg>`;

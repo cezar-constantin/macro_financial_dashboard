@@ -3,13 +3,12 @@ import { t, isNum, applyStaticTranslations } from "./common.js";
 import {
   $, L, E, nf, sgn, IND, indName, fmtI, fmtU, fmtPeriod, loadData, obsOf, has, S, inP, lastObs, firstObs,
   annualAvg, toObs, caRolling, caAnnual, getPeriod, periodPanel, renderMacroShell, errorPanel, tsChart,
-  stackChart, spark, legend, C, yearOf,
+  stackChart, spark, legend, C, yearOf, fxEur,
 } from "./macro.js";
 
 const state = { P: null, eu: true };
 
 // ------------------------------------------------------------------ derived series
-const fxEur = () => (has("eurron_m") ? obsOf("eurron_m") : obsOf("eurron_m_es"));
 const fxEurId = () => (has("eurron_m") ? "eurron_m" : "eurron_m_es");
 function realPolicyRate() {
   const h = Object.fromEntries(obsOf("hicp_m"));
@@ -136,7 +135,7 @@ function growth() {
       card(
         L("Contribuții la creșterea PIB", "Contributions to GDP growth"),
         L("Puncte procentuale; bara neagră este creșterea totală. Cine a tras economia: consumul, investițiile sau exportul net?", "Percentage points; the dark bar is total growth. What drove the economy: consumption, investment or net exports?"),
-        stackChart(rows, obsOf("gdp_real_a"), from, Math.min(to, yearOf(obsOf("gdp_real_a").slice(-1)[0]?.[0] || String(to))), { totalLabel: L("Creștere PIB", "GDP growth") }),
+        stackChart(rows, obsOf("gdp_real_a"), from, Math.min(to, yearOf(obsOf("gdp_real_a").slice(-1)[0]?.[0] || String(to))), { totalLabel: L("Creștere PIB", "GDP growth"), width: 1300, height: 330 }),
         [...rows, { label: L("Creștere PIB", "GDP growth"), color: "#162554" }],
         ["contrib_cons_a"],
         " span-2"
@@ -155,6 +154,13 @@ function growth() {
         tsChart([ro("gdp_pc_pps_a")], from, to, { yfmt: (v) => nf(v, 0), refs: [{ y: 100, label: L("media UE", "EU average"), color: "#5b6786" }], zero: false }),
         null,
         ["gdp_pc_pps_a"]
+      ) +
+      card(
+        indName("wb_gdp_pc_usd"),
+        L("Dolari curenți (Banca Mondială). Include efectul cursului de schimb, deci nu măsoară direct nivelul de trai.", "Current dollars (World Bank). Includes exchange-rate effects, so it does not measure living standards directly."),
+        tsChart([ro("wb_gdp_pc_usd", { bars: true, barW: 0.5 })], from, to, { yfmt: (v) => nf(v / 1000, 0) + L(" mii", "k") }),
+        null,
+        ["wb_gdp_pc_usd"]
       )
   );
 }
@@ -182,9 +188,10 @@ function prices() {
     card(
       L("Inflația: totală, de bază și media UE", "Inflation: headline, core and EU average"),
       L("Rata anuală a IAPC. Banda verde este intervalul țintei BNR (2,5 % ± 1 pp).", "Annual HICP rate. The green band is the NBR target range (2.5% ± 1 pp)."),
-      tsChart(infl, from, to, { yfmt: pctAxis, band: { lo: 1.5, hi: 3.5, label: L("ținta BNR", "NBR target") } }),
+      tsChart(infl, from, to, { yfmt: pctAxis, band: { lo: 1.5, hi: 3.5, label: L("ținta BNR", "NBR target") }, width: 1300, height: 320 }),
       infl,
-      ["hicp_m"]
+      ["hicp_m"],
+      " span-2"
     ) +
       card(
         L("Componentele inflației", "Inflation components"),
@@ -319,7 +326,7 @@ function external() {
         L("Medie lunară a cursurilor de referință. Regim de flotare controlată: BNR netezește variațiile.", "Monthly average of reference rates. Managed float: the NBR smooths fluctuations."),
         tsChart(fx, from, to, { yfmt: (v) => nf(v, 2), zero: false }),
         null,
-        [fxEurId()]
+        [fxEurId(), "eurron_m_es"]
       ) +
       card(
         indName("reer_m"),
@@ -375,7 +382,8 @@ function outlook() {
   const body = imf
     .map((id) => {
       const m = Object.fromEntries(obsOf(id));
-      return `<tr><td>${E(indName(id).replace(/^(FMI|IMF) · /, ""))}</td>${years.map((y) => `<td class="num">${E(isNum(m[y]) ? nf(m[y], 1) : "—")}</td>`).join("")}</tr>`;
+      const name = indName(id).replace(/^(FMI|IMF) · /, "");
+      return `<tr><td>${E(name[0].toUpperCase() + name.slice(1))}</td>${years.map((y) => `<td class="num">${E(isNum(m[y]) ? nf(m[y], 1) : "—")}</td>`).join("")}</tr>`;
     })
     .join("");
   const g = [
@@ -388,7 +396,7 @@ function outlook() {
       <div><h3>${E(L("Proiecțiile Fondului Monetar Internațional (World Economic Outlook)", "International Monetary Fund projections (World Economic Outlook)"))}</h3>
       <p class="chart-caption">${E(L("Ultima ediție WEO disponibilă; p = proiecție. Proiecțiile nu depind de perioada aleasă și nu sunt produse de acest instrument.", "Latest WEO vintage; p = projection. Projections do not depend on the chosen period and are not produced by this tool."))}</p></div>
       <div class="table-scroll"><table class="data-table"><thead><tr><th>${E(L("Indicator", "Indicator"))}</th>${head}</tr></thead><tbody>${body}</tbody></table></div>
-      ${tsChart(g, Math.max(state.P.min, y0 - 5), y0 + 5, { yfmt: pctAxis, height: 220 })}
+      ${tsChart(g, Math.max(state.P.min, y0 - 5), y0 + 5, { yfmt: pctAxis, width: 1300, height: 280 })}
       ${legend(g)}
       <p class="source-note">${E(t("d.source"))}: ${E(S("imf_gdp")?.source || "")}</p>
     </article>`

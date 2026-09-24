@@ -3,13 +3,14 @@
 // qualitative word ("robust", "disinflation", "slippage"...) comes from a fixed threshold below.
 import { isNum } from "./common.js";
 import {
-  L, nf, sgn, obsOf, has, inP, lastObs, firstObs, annualAvg, mean, maxBy, minBy, caAnnual, fmtPeriod, yearOf, indName, S,
+  L, nf, sgn, obsOf, has, fxEur, inP, lastObs, firstObs, annualAvg, mean, maxBy, minBy, caAnnual, fmtPeriod, yearOf, indName, S,
 } from "./macro.js";
 
 // ------------------------------------------------------------------ small helpers
-const pc = (v, d = 1) => (isNum(v) ? nf(v, d) + " %" : "—");
+const PS = () => L(" %", "%");
+const pc = (v, d = 1) => (isNum(v) ? nf(v, d) + PS() : "—");
 const pp = (v, d = 1) => (isNum(v) ? sgn(v, d) + " pp" : "—");
-const pGDP = (v, d = 1) => (isNum(v) ? nf(v, d) + L(" % din PIB", " % of GDP") : "—");
+const pGDP = (v, d = 1) => (isNum(v) ? nf(v, d) + L(" % din PIB", "% of GDP") : "—");
 const byYear = (obs) => Object.fromEntries(obs.map(([p, v]) => [+p.slice(0, 4), v]));
 const years = (from, to) => Array.from({ length: to - from + 1 }, (_, i) => from + i);
 
@@ -48,7 +49,7 @@ const firstKey = (obj) => {
 };
 function listYears(obj, d = 1) {
   return Object.entries(obj)
-    .map(([y, v]) => `${y}: ${sgn(v, d)} %`)
+    .map(([y, v]) => `${y}: ${sgn(v, d)}${PS()}`)
     .join("; ");
 }
 function cagr(a, b, n) {
@@ -88,7 +89,12 @@ function deficitWord(d) {
 export function scoreboard(P) {
   const { to } = P;
   const rows = [];
-  const add = (key, label, value, fmt, thrLabel, breach, note = "") => rows.push({ key, label, value, fmt, thrLabel, breach, note });
+  const SHORT = {
+    ca3: L("contul curent", "current account"), niip: L("poziția investițională netă", "net investment position"), reer: L("cursul real efectiv", "real effective exchange rate"),
+    ulc: L("costul unitar al muncii", "unit labour cost"), hpi: L("prețurile locuințelor", "house prices"), credit_gdp_a: L("datoria privată", "private debt"),
+    credit_flow_a: L("fluxul de credit privat", "private credit flow"), debt: L("datoria publică", "public debt"), unemp: L("șomajul", "unemployment"), deficit: L("deficitul bugetar", "budget deficit"),
+  };
+  const add = (key, label, value, fmt, thrLabel, breach, note = "") => rows.push({ key, label, short: SHORT[key] || label, value, fmt, thrLabel, breach, note });
   const official = (id) => lastObs(obsOf(id), to);
   const offNote = L("valoare oficială Eurostat (tabloul MIP)", "official Eurostat value (MIP scoreboard)");
   const calcNote = L("calculat din seriile tabloului de bord", "computed from the dashboard series");
@@ -252,8 +258,8 @@ export function buildReport(P) {
       const tech = qoq.length === 2 && qoq.every(([, v]) => v < 0);
       out.push(
         L(
-          `Dinamica la final de perioadă: în ${fmtPeriod(q.last[0])}, PIB-ul era cu ${sgn(q.last[1], 1)} % față de același trimestru al anului anterior (ultimele patru trimestre: ${last4.map(([p, v]) => `${fmtPeriod(p)} ${sgn(v, 1)} %`).join(", ")}).${tech ? " Ultimele două trimestre au înregistrat scăderi față de trimestrul anterior — definiția tehnică a recesiunii." : ""}`,
-          `Momentum at the end of the period: in ${fmtPeriod(q.last[0])} GDP was ${sgn(q.last[1], 1)}% above the same quarter a year earlier (last four quarters: ${last4.map(([p, v]) => `${fmtPeriod(p)} ${sgn(v, 1)}%`).join(", ")}).${tech ? " The last two quarters both fell quarter on quarter — the technical definition of a recession." : ""}`
+          `Dinamica la final de perioadă: în ${fmtPeriod(q.last[0])}, PIB-ul real era cu ${nf(Math.abs(q.last[1]), 1)} % ${q.last[1] < 0 ? "sub" : "peste"} nivelul din același trimestru al anului anterior (ultimele patru trimestre: ${last4.map(([p, v]) => `${fmtPeriod(p)} ${sgn(v, 1)} %`).join(", ")}).${tech ? " Ultimele două trimestre au înregistrat scăderi față de trimestrul anterior — definiția tehnică a recesiunii." : ""}`,
+          `Momentum at the end of the period: in ${fmtPeriod(q.last[0])} real GDP was ${nf(Math.abs(q.last[1]), 1)}% ${q.last[1] < 0 ? "below" : "above"} the same quarter a year earlier (last four quarters: ${last4.map(([p, v]) => `${fmtPeriod(p)} ${sgn(v, 1)}%`).join(", ")}).${tech ? " The last two quarters both fell quarter on quarter — the technical definition of a recession." : ""}`
         )
       );
       if (tech || q.last[1] < 0) risks.push(L(`Activitatea economică se contractă la final de perioadă (${fmtPeriod(q.last[0])}: ${sgn(q.last[1], 1)} % an/an).`, `Economic activity is contracting at the end of the period (${fmtPeriod(q.last[0])}: ${sgn(q.last[1], 1)}% y/y).`));
@@ -285,8 +291,8 @@ export function buildReport(P) {
         b = pps[lastKey(pps)];
       out.push(
         L(
-          `Convergența reală: PIB-ul pe locuitor la paritatea puterii de cumpărare a trecut de la ${nf(a, 0)} % la ${nf(b, 0)} % din media UE (${firstKey(pps)}–${lastKey(pps)}), adică ${sgn(b - a, 0)} puncte.`,
-          `Real convergence: GDP per capita in purchasing power standards moved from ${nf(a, 0)}% to ${nf(b, 0)}% of the EU average (${firstKey(pps)}–${lastKey(pps)}), i.e. ${sgn(b - a, 0)} points.`
+          `Convergența reală: PIB-ul pe locuitor la paritatea puterii de cumpărare a trecut de la ${nf(a, 0)} % la ${nf(b, 0)} % din media UE (${firstKey(pps)}–${lastKey(pps)}), adică ${sgn(b - a, 1)} puncte.`,
+          `Real convergence: GDP per capita in purchasing power standards moved from ${nf(a, 0)}% to ${nf(b, 0)}% of the EU average (${firstKey(pps)}–${lastKey(pps)}), i.e. ${sgn(b - a, 1)} points.`
         )
       );
     }
@@ -362,8 +368,8 @@ export function buildReport(P) {
     if (b10)
       out.push(
         L(
-          `Piețele: ${r3 ? `ROBOR 3M a încheiat la ${pc(r3.last[1], 2)}, ` : ""}randamentul titlurilor de stat la 10 ani la ${pc(b10.last[1], 2)} (maxim ${pc(b10.max[1], 2)} în ${fmtPeriod(b10.max[0])}).${pr ? ` Diferența față de dobânda BNR, de ${pp(b10.last[1] - pr.last[1], 2)}, măsoară prima de termen și de risc cerută de investitori pentru datoria statului.` : ""}`,
-          `Markets: ${r3 ? `3M ROBOR ended at ${pc(r3.last[1], 2)}, ` : ""}the 10-year government bond yield at ${pc(b10.last[1], 2)} (peak ${pc(b10.max[1], 2)} in ${fmtPeriod(b10.max[0])}).${pr ? ` The gap to the NBR rate, ${pp(b10.last[1] - pr.last[1], 2)}, measures the term and risk premium investors demand on government debt.` : ""}`
+          `Piețele: ${r3 ? `ROBOR 3M a încheiat la ${pc(r3.last[1], 2)}, ` : ""}randamentul titlurilor de stat la 10 ani la ${pc(b10.last[1], 2)} (maxim ${pc(b10.max[1], 2)} în ${fmtPeriod(b10.max[0])}).${pr ? (b10.last[1] - pr.last[1] > 0.5 ? ` Diferența față de dobânda BNR, de ${pp(b10.last[1] - pr.last[1], 2)}, măsoară prima de termen și de risc cerută de investitori pentru datoria statului.` : ` Diferența față de dobânda BNR este de doar ${pp(b10.last[1] - pr.last[1], 2)}: curba este plată, semn că piața anticipează reducerea dobânzilor, chiar dacă prima de risc a statului rămâne ridicată.`) : ""}`,
+          `Markets: ${r3 ? `3M ROBOR ended at ${pc(r3.last[1], 2)}, ` : ""}the 10-year government bond yield at ${pc(b10.last[1], 2)} (peak ${pc(b10.max[1], 2)} in ${fmtPeriod(b10.max[0])}).${pr ? (b10.last[1] - pr.last[1] > 0.5 ? ` The gap to the NBR rate, ${pp(b10.last[1] - pr.last[1], 2)}, measures the term and risk premium investors demand on government debt.` : ` The gap to the NBR rate is only ${pp(b10.last[1] - pr.last[1], 2)}: the curve is flat, a sign that markets expect rate cuts, even if the sovereign risk premium stays high.`) : ""}`
         )
       );
     if (b10 && b10.last[1] > 6.5) risks.push(L(`Costul de finanțare al statului este ridicat (randament la 10 ani ${pc(b10.last[1], 2)}), ceea ce crește povara dobânzilor.`, `The sovereign's funding cost is high (10-year yield ${pc(b10.last[1], 2)}), raising the interest burden.`));
@@ -421,8 +427,8 @@ export function buildReport(P) {
       const cumEU = Object.keys(ulcEU).length ? (vals(ulcEU).reduce((a, x) => a * (1 + x / 100), 1) - 1) * 100 : null;
       out.push(
         L(
-          `Costul unitar nominal al muncii a crescut cumulat cu ${pc(cum, 0)} între ${firstKey(ulc)} și ${lastKey(ulc)}${isNum(cumEU) ? `, față de ${pc(cumEU, 0)} în UE27` : ""}: salariile au crescut mai repede decât productivitatea, ceea ce erodează competitivitatea prin costuri.`,
-          `Nominal unit labour costs rose cumulatively by ${pc(cum, 0)} between ${firstKey(ulc)} and ${lastKey(ulc)}${isNum(cumEU) ? `, versus ${pc(cumEU, 0)} in the EU27` : ""}: wages grew faster than productivity, eroding cost competitiveness.`
+          `Costul unitar nominal al muncii a crescut cumulat cu ${pc(cum, 0)} între ${firstKey(ulc)} și ${lastKey(ulc)}${isNum(cumEU) ? `, față de ${pc(cumEU, 0)} în UE27` : ""}${isNum(cumEU) && cum - cumEU > 3 * Object.keys(ulc).length ? ": salariile au crescut mult mai repede decât productivitatea, ceea ce erodează competitivitatea prin costuri." : "."}`,
+          `Nominal unit labour costs rose cumulatively by ${pc(cum, 0)} between ${firstKey(ulc)} and ${lastKey(ulc)}${isNum(cumEU) ? `, versus ${pc(cumEU, 0)} in the EU27` : ""}${isNum(cumEU) && cum - cumEU > 3 * Object.keys(ulc).length ? ": wages grew much faster than productivity, eroding cost competitiveness." : "."}`
         )
       );
       if (isNum(cumEU) && cum - cumEU > 15) risks.push(L("Costul unitar al muncii crește mult mai repede decât în UE, cu presiune asupra competitivității externe.", "Unit labour costs are rising much faster than in the EU, putting pressure on external competitiveness."));
@@ -574,8 +580,7 @@ export function buildReport(P) {
         )
       );
     }
-    const fxId = has("eurron_m") ? "eurron_m" : "eurron_m_es";
-    const fx = st(obsOf(fxId), from, to);
+    const fx = st(fxEur(), from, to);
     if (fx && fx.n > 12) {
       const ch = (fx.last[1] / fx.first[1] - 1) * 100;
       const yrs = (yearOf(fx.last[0]) * 12 + +fx.last[0].slice(5, 7) - (yearOf(fx.first[0]) * 12 + +fx.first[0].slice(5, 7))) / 12;
@@ -607,8 +612,8 @@ export function buildReport(P) {
   const breaches = sb.filter((r) => r.breach);
   summary.push(
     L(
-      `Tabloul de dezechilibre: ${breaches.length} din ${sb.length} indicatori peste prag${breaches.length ? ` (${breaches.map((b) => b.label.replace(/ \(.*\)$/, "").replace(/,.*$/, "").toLowerCase()).join("; ")})` : ""}.`,
-      `Imbalance scoreboard: ${breaches.length} of ${sb.length} indicators beyond threshold${breaches.length ? ` (${breaches.map((b) => b.label.replace(/ \(.*\)$/, "").replace(/,.*$/, "").toLowerCase()).join("; ")})` : ""}.`
+      `Tabloul de dezechilibre: ${breaches.length} din ${sb.length} indicatori peste prag${breaches.length ? ` (${breaches.map((b) => b.short).join(", ")})` : ""}.`,
+      `Imbalance scoreboard: ${breaches.length} of ${sb.length} indicators beyond threshold${breaches.length ? ` (${breaches.map((b) => b.short).join(", ")})` : ""}.`
     )
   );
 
@@ -619,10 +624,15 @@ export function buildReport(P) {
     const d = mean(vals(annual("deficit_a", from, to)));
     const ca = mean(vals(Object.fromEntries(Object.entries(caAnnual()).filter(([y]) => +y >= from && +y <= to))));
     const tags = [];
-    if (isNum(g) && g < 0) tags.push(L("recesiune", "recession"));
+    const ga = annual("gdp_real_a", from, to);
+    const recY = Object.entries(ga).filter(([, v]) => v < 0).map(([y]) => y);
+    if (recY.length) tags.push(L(`recesiune în ${recY.join(", ")}`, `recession in ${recY.join(", ")}`) + (ga[lastKey(ga)] > 3 ? L(", urmată de revenire", ", followed by recovery") : ""));
+    if (isNum(g) && g < 0) {
+      /* already described by the recession tag */
+    }
     else if (isNum(g) && h && g < 1.5 && h.mean > 5) tags.push(L("stagflație (creștere slabă și inflație ridicată)", "stagflation (weak growth and high inflation)"));
     else if (isNum(g) && g >= 3.5) tags.push(L("expansiune rapidă", "rapid expansion"));
-    else if (isNum(g)) tags.push(growthWord(g));
+    else if (isNum(g) && !recY.length) tags.push(growthWord(g));
     if (h && h.mean > 5) tags.push(L("presiuni inflaționiste puternice", "strong inflationary pressure"));
     else if (h && h.mean < 2) tags.push(L("inflație redusă", "low inflation"));
     if (isNum(d) && d < -3 && isNum(ca) && ca < -3) tags.push(L("deficite gemene", "twin deficits"));
@@ -698,7 +708,7 @@ export function factTable(P) {
     ["debt_a", L("Datoria publică (% PIB)", "Government debt (% GDP)"), annual("debt_a", from, to)],
     ["ca_q", L("Cont curent (% PIB)", "Current account (% GDP)"), Object.fromEntries(Object.entries(caAnnual()).filter(([y]) => +y >= from && +y <= to))],
     ["niip_a", L("PIIN (% PIB)", "NIIP (% GDP)"), annual("niip_a", from, to)],
-    ["eurron_m", L("EUR/RON, medie anuală", "EUR/RON, annual avg."), annual(has("eurron_m") ? "eurron_m" : "eurron_m_es", from, to)],
+    ["eurron_m", L("EUR/RON, medie anuală", "EUR/RON, annual avg."), Object.fromEntries(Object.entries(annualAvg(fxEur())).filter(([y]) => +y >= from && +y <= to))],
     ["gdp_pc_pps_a", L("PIB/loc. PPS (UE27 = 100)", "GDP per capita PPS (EU27 = 100)"), annual("gdp_pc_pps_a", from, to)],
   ].filter(([, , v]) => Object.keys(v).length);
   return { years: years(from, to), rows: rows.map(([id, label, v]) => ({ id, label, v })) };

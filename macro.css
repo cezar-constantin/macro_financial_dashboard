@@ -54,3 +54,7 @@
   .site-nav, .period-card, #site-footer, .button-row, .prompt-box { display: none !important; }
 }
 #workspace { display: grid; gap: 22px; }
+.tool-grid .tool-card { display: flex; flex-direction: column; }
+.tool-grid .tool-card > a:last-child { margin-top: auto; }
+.data-table .small-button { appearance: none; cursor: pointer; font: inherit; font-size: 0.8rem; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(163, 180, 235, 0.5); background: #fff; color: var(--blue-deep); }
+.data-table .small-button:hover { background: var(--blue-soft); }

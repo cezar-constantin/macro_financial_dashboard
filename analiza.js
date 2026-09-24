@@ -130,9 +130,8 @@ function render() {
 renderMacroShell("report");
 (async () => {
   try {
-    const d = await loadData();
+    await loadData();
     state.P = getPeriod();
-    $("hero-updated").textContent = d.generated.slice(0, 10);
     render();
     if (new URLSearchParams(location.search).has("auto")) generate(false);
   } catch (e) {

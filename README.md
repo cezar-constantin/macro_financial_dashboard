@@ -6,6 +6,8 @@ aleasă. Tot calculul rulează în browser; utilizatorii nu fac niciun apel API 
 server. Interfață RO/EN, cu același aspect ca materialele
 [Analiză financiară cu AI](https://github.com/cezar-constantin/analiza_financiara_cu_ai_avansat).
 
+Live: https://cezar-constantin.github.io/macro_financial_dashboard/
+
 | Pagină | Ce face |
 |---|---|
 | `index.html` — acasă | Prezentarea instrumentelor și trei avertismente de metodă. |

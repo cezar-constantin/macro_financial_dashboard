@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+"""Download the official definitions of the indicators shown on the dashboard and write
+data/definitions_source.json (original texts, in the language published by each source).
+
+  * Eurostat - Statistics Explained glossary (MediaWiki API)
+  * World Bank - WDI indicator "sourceNote"
+  * IMF - DataMapper indicator descriptions
+  * INS - TEMPO matrix metadata (definition and methodology fields)
+  * BIS - dataflow descriptions (SDMX structure API)
+
+The texts are the reference for the short definitions shown under each chart (macro.js, DEFS).
+Run: python3 scripts/fetch_definitions.py
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import sys
+import urllib.parse
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fetch_data import http_get, INS  # noqa: E402
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(ROOT, "data", "definitions_source.json")
+SE = "https://ec.europa.eu/eurostat/statistics-explained/api.php"
+
+GLOSSARY = [
+    "Gross domestic product (GDP)", "Real gross domestic product (GDP) growth", "GDP growth rate", "Real GDP growth rate",
+    "Volume", "Chain-linked volumes", "Seasonal adjustment", "Purchasing power standard (PPS)", "Purchasing power parities (PPPs)",
+    "GDP per capita", "Volume index of GDP per capita in PPS", "Household consumption expenditure", "Final consumption expenditure",
+    "Final consumption expenditure of general government", "Government consumption expenditure", "Gross fixed capital formation (GFCF)",
+    "Changes in inventories", "Net exports", "Exports of goods and services", "Imports of goods and services", "External balance of goods and services",
+    "Industrial production (volume) index", "Industrial production index", "Retail trade volume index", "Volume of retail trade",
+    "Production in construction", "Construction production index", "Economic sentiment indicator (ESI)", "Economic sentiment indicator",
+    "Consumer confidence indicator", "Consumer confidence indicator (CCI)", "Harmonised index of consumer prices (HICP)", "Inflation rate",
+    "Core inflation", "Annual rate of change", "House price index (HPI)", "Unemployment", "Unemployment rate", "Youth unemployment",
+    "Youth unemployment rate", "Employment rate", "Labour cost index (LCI)", "Labour costs", "Nominal unit labour cost (NULC)",
+    "Unit labour cost", "Minimum wage", "Minimum wages", "Public balance", "Government deficit", "Government deficit/surplus",
+    "Government debt", "General government gross debt", "General government", "Total general government revenue",
+    "Total general government expenditure", "Government revenue", "Government expenditure", "Interest", "Current account",
+    "Balance of payments", "Goods", "Services", "Primary income", "Secondary income", "International investment position (IIP)",
+    "Net international investment position (NIIP)", "Money market interest rate", "Interest rate", "Long-term interest rate",
+    "EMU convergence criterion bond yields", "Maastricht criteria", "Exchange rate", "Real effective exchange rate (REER)",
+    "Effective exchange rate", "Private sector debt", "Private sector credit flow", "Macroeconomic imbalance procedure (MIP)",
+    "Excessive deficit procedure (EDP)", "Population", "Stability and growth pact", "European system of accounts (ESA)",
+    "Consumer price index (CPI)", "ILO", "International Labour Organisation (ILO)", "Labour force", "Remittances",
+]
+
+WB = ["NY.GDP.PCAP.CD", "BX.KLT.DINV.WD.GD.ZS", "NE.TRD.GNFS.ZS", "BX.TRF.PWKR.DT.GD.ZS"]
+IMF = ["NGDP_RPCH", "PCPIPCH", "LUR", "BCA_NGDPD", "GGXCNL_NGDP", "GGXWDG_NGDP"]
+BIS = ["WS_CBPOL", "WS_EER"]
+
+
+def se_extract(title: str) -> dict | None:
+    page = "Glossary:" + title
+    q = {"action": "query", "prop": "extracts", "explaintext": "1", "redirects": "1", "format": "json", "titles": page}
+    try:
+        js = json.loads(http_get(SE + "?" + urllib.parse.urlencode(q), tries=2))
+        for p in js.get("query", {}).get("pages", {}).values():
+            if "missing" in p:
+                return None
+            txt = p.get("extract") or ""
+            if txt.strip():
+                return {"title": p["title"], "text": txt.strip()}
+    except Exception as e:  # noqa: BLE001
+        print("extract failed", page, str(e)[:150])
+    # fallback: raw wikitext
+    q = {"action": "parse", "page": page, "prop": "wikitext", "redirects": "1", "format": "json"}
+    try:
+        js = json.loads(http_get(SE + "?" + urllib.parse.urlencode(q), tries=2))
+        if "error" in js:
+            return None
+        wt = js["parse"]["wikitext"]["*"]
+        wt = re.sub(r"\{\{[^{}]*\}\}", "", wt)
+        wt = re.sub(r"\[\[(?:[^|\]]*\|)?([^\]]*)\]\]", r"\1", wt)
+        wt = re.sub(r"\[https?://\S+ ([^\]]*)\]", r"\1", wt)
+        wt = re.sub(r"'{2,}", "", wt)
+        wt = re.sub(r"<[^>]+>", "", wt)
+        return {"title": js["parse"]["title"], "text": wt.strip()}
+    except Exception as e:  # noqa: BLE001
+        print("parse failed", page, str(e)[:150])
+        return None
+
+
+def glossary_index() -> list[str]:
+    titles, cont = [], {}
+    while True:
+        q = {"action": "query", "list": "allpages", "apprefix": "Glossary:", "aplimit": "500", "format": "json", **cont}
+        try:
+            js = json.loads(http_get(SE + "?" + urllib.parse.urlencode(q), tries=2))
+        except Exception as e:  # noqa: BLE001
+            print("allpages failed", str(e)[:150])
+            break
+        titles += [p["title"] for p in js.get("query", {}).get("allpages", [])]
+        if "continue" not in js:
+            break
+        cont = {"apcontinue": js["continue"]["apcontinue"]}
+    return titles
+
+
+def main():
+    out = {"eurostat_glossary": {}, "eurostat_glossary_missing": [], "worldbank": {}, "imf": {}, "ins": {}, "bis": {}}
+    idx = glossary_index()
+    out["eurostat_glossary_index"] = idx
+    print("glossary pages:", len(idx))
+    for t in GLOSSARY:
+        r = se_extract(t)
+        if r:
+            out["eurostat_glossary"][t] = {**r, "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=" + urllib.parse.quote(r["title"].replace(" ", "_"))}
+            print("OK  ", t)
+        else:
+            out["eurostat_glossary_missing"].append(t)
+            print("MISS", t)
+    for code in WB:
+        try:
+            js = json.loads(http_get(f"https://api.worldbank.org/v2/indicator/{code}?format=json"))
+            d = js[1][0]
+            out["worldbank"][code] = {"name": d["name"], "text": d.get("sourceNote", ""), "source": d.get("sourceOrganization", ""),
+                                      "url": f"https://data.worldbank.org/indicator/{code}"}
+            print("OK   WB", code)
+        except Exception as e:  # noqa: BLE001
+            print("FAIL WB", code, str(e)[:150])
+    try:
+        js = json.loads(http_get("https://www.imf.org/external/datamapper/api/v1/indicators"))
+        for code in IMF:
+            d = js["indicators"].get(code, {})
+            out["imf"][code] = {"name": d.get("label"), "text": d.get("description"), "unit": d.get("unit"), "source": d.get("source"),
+                                "url": f"https://www.imf.org/external/datamapper/{code}@WEO"}
+        print("OK   IMF")
+    except Exception as e:  # noqa: BLE001
+        print("FAIL IMF", str(e)[:150])
+    for code in ["FOM106D"]:
+        try:
+            m = json.loads(http_get(INS + "matrix/" + code, timeout=60))
+            out["ins"][code] = {k: m.get(k) for k in ("matrixName", "definitie", "metodologie", "observatii", "ultimaActualizare", "intrerupere", "continuareSerie", "periodicitati")}
+            out["ins"][code]["details"] = {k: v for k, v in (m.get("details") or {}).items() if isinstance(v, (str, int))}
+            print("OK   INS", code)
+        except Exception as e:  # noqa: BLE001
+            print("FAIL INS", code, str(e)[:150])
+    for flow in BIS:
+        for url in (f"https://stats.bis.org/api/v1/dataflow/BIS/{flow}/1.0?detail=full", f"https://stats.bis.org/api/v2/structure/dataflow/BIS/{flow}/1.0"):
+            try:
+                txt = http_get(url, headers={"Accept": "application/vnd.sdmx.structure+xml;version=2.1, application/xml"}).decode("utf-8", "replace")
+                names = re.findall(r"<(?:com|common):Name[^>]*>(.*?)</(?:com|common):Name>", txt, re.S)
+                descs = re.findall(r"<(?:com|common):Description[^>]*>(.*?)</(?:com|common):Description>", txt, re.S)
+                ann = re.findall(r"<(?:com|common):AnnotationText[^>]*>(.*?)</(?:com|common):AnnotationText>", txt, re.S)
+                out["bis"][flow] = {"url": url, "names": names[:5], "descriptions": descs[:5], "annotations": [a[:3000] for a in ann[:10]]}
+                print("OK   BIS", flow)
+                break
+            except Exception as e:  # noqa: BLE001
+                print("FAIL BIS", url, str(e)[:150])
+    with open(OUT, "w", encoding="utf-8") as fh:
+        json.dump(out, fh, ensure_ascii=False, indent=1)
+    print("written", OUT)
+
+
+if __name__ == "__main__":
+    main()

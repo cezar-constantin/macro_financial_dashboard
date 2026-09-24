@@ -9,7 +9,6 @@ const RO = {
   "nav.dash": "Tablou de bord",
   "nav.report": "Analiza generată",
   "nav.data": "Date și surse",
-  "nav.fin": "Analiză financiară cu AI",
   "m.level": "Macroeconomie · România",
   "m.pill": "10 ani de date oficiale",
   "footer.source":
@@ -147,7 +146,6 @@ const EN = {
   "nav.dash": "Dashboard",
   "nav.report": "Generated analysis",
   "nav.data": "Data & sources",
-  "nav.fin": "Financial analysis with AI",
   "m.level": "Macroeconomics · Romania",
   "m.pill": "10 years of official data",
   "footer.source":
@@ -571,8 +569,7 @@ export function renderMacroShell(active) {
       link("dash", "./tablou.html", "dash") +
       link("report", "./analiza.html", "report") +
       link("data", "./surse.html", "data") +
-      `<a class="nav-link" href="https://cezar-constantin.github.io/analiza_financiara_cu_ai_avansat/" target="_blank" rel="noreferrer" data-i18n="nav.fin"></a>
-      <div class="lang-switch" role="group" aria-label="Language">
+      `<div class="lang-switch" role="group" aria-label="Language">
         <button type="button" data-lang="ro">RO</button>
         <button type="button" data-lang="en">EN</button>
       </div>`;
